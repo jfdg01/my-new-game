@@ -11,12 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.kandclay.handlers.SpineAnimationHandler;
 import com.kandclay.utils.Constants;
-import com.kandclay.utils.ScreenType;
 import com.kandclay.utils.TrailDot;
-
-import javax.swing.text.View;
 
 public class ConfigurationScreen extends BaseScreen {
     private Slider volumeSlider;
@@ -24,9 +20,6 @@ public class ConfigurationScreen extends BaseScreen {
     private TextButton hairColorButton;
     private TextButton coinColorButton;
     private boolean isYellowCoin;
-    private SpriteBatch batch;
-    private Camera camera;
-    private Viewport viewport;
     private Stage stage;
 
     public ConfigurationScreen() {
@@ -36,10 +29,9 @@ public class ConfigurationScreen extends BaseScreen {
     @Override
     public void show() {
 
-        camera = new OrthographicCamera();
-        viewport = new ScreenViewport(camera);
+        Camera camera = new OrthographicCamera();
+        Viewport viewport = new ScreenViewport(camera);
         stage = new Stage(viewport);
-        batch = new SpriteBatch();
 
         Skin skin = game.getAssetManager().get(Constants.Skin.JSON, Skin.class);
         float savedVolume = game.getConfigManager().getPreference("volume", Constants.Audio.DEFAULT_VOLUME);
@@ -99,18 +91,18 @@ public class ConfigurationScreen extends BaseScreen {
         super.render(delta);
         clearScreen();
 
-        viewport.apply();
-        batch.setProjectionMatrix(viewport.getCamera().combined);
+        stage.getViewport().apply();
+        game.getBatch().setProjectionMatrix(stage.getViewport().getCamera().combined);
 
         stage.act(delta);
         stage.draw();
 
-        TrailDot.renderTrail(batch, viewport);
+        TrailDot.renderTrail( game.getBatch(), stage.getViewport());
     }
 
     @Override
     public void resize(int width, int height) {
-        viewport.update(width, height, true);
+        stage.getViewport().update(width, height, true);
     }
 
     @Override

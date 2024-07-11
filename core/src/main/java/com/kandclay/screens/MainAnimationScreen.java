@@ -20,14 +20,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.esotericsoftware.spine.*;
 
-import com.kandclay.handlers.SpineAnimationHandler;
 import com.kandclay.utils.Constants;
-import com.kandclay.managers.*;
-import com.kandclay.utils.ScreenType;
 import com.kandclay.utils.TrailDot;
 
 import java.util.HashMap;
@@ -39,9 +35,6 @@ public class MainAnimationScreen extends BaseScreen {
     private float speedMultiplier = 1f;
     private float lastSliderValue = 0f;
 
-    private SpriteBatch batch;
-    private Camera camera;
-    private Viewport viewport;
     private Stage stage;
 
     private TextureRegion backgroundTexture;
@@ -60,10 +53,9 @@ public class MainAnimationScreen extends BaseScreen {
     @Override
     public void show() {
 
-        camera = new OrthographicCamera();
-        viewport = new ExtendViewport(Constants.General.EMBED_WIDTH, Constants.General.EMBED_HEIGHT, camera);
+        Camera camera = new OrthographicCamera();
+        Viewport viewport = new ExtendViewport(Constants.General.EMBED_WIDTH, Constants.General.EMBED_HEIGHT, camera);
         stage = new Stage(viewport);
-        batch = new SpriteBatch();
 
         skeletonRenderer = new SkeletonRenderer();
         skeletonRenderer.setPremultipliedAlpha(true);
@@ -203,9 +195,8 @@ public class MainAnimationScreen extends BaseScreen {
             states.set(AnimationType.COIN.ordinal(), game.getSpineAnimationHandler().createAnimationState(skeletons.get(AnimationType.COIN.ordinal())));
         }
 
-        setSkeletonScale(skeletons.get(AnimationType.COIN.ordinal()), Constants.MainAnimationScreen.COIN_WIDTH_PERCENTAGE, Constants.MainAnimationScreen.COIN_HEIGHT_PERCENTAGE, viewport);
-        setSkeletonPosition(skeletons.get(AnimationType.COIN.ordinal()), viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2);
-
+        setSkeletonScale(skeletons.get(AnimationType.COIN.ordinal()), Constants.MainAnimationScreen.COIN_WIDTH_PERCENTAGE, Constants.MainAnimationScreen.COIN_HEIGHT_PERCENTAGE, stage.getViewport());
+        setSkeletonPosition(skeletons.get(AnimationType.COIN.ordinal()), stage.getViewport().getWorldWidth() / 2, stage.getViewport().getWorldHeight() / 2);
         states.get(AnimationType.COIN.ordinal()).setAnimation(0, "animation", true);
         states.get(AnimationType.COIN.ordinal()).getCurrent(0).setTrackTime(stateTime);
         states.get(AnimationType.COIN.ordinal()).addListener(new AnimationState.AnimationStateAdapter() {
@@ -232,8 +223,8 @@ public class MainAnimationScreen extends BaseScreen {
         skeletons.insert(AnimationType.BUTTON.ordinal(), game.getSpineAnimationHandler().createSkeleton(atlasPath, skeletonPath));
         states.insert(AnimationType.BUTTON.ordinal(), game.getSpineAnimationHandler().createAnimationState(skeletons.get(AnimationType.BUTTON.ordinal())));
 
-        setSkeletonScale(skeletons.get(AnimationType.BUTTON.ordinal()), Constants.MainAnimationScreen.BUTTONS_WIDTH_PERCENTAGE, Constants.MainAnimationScreen.BUTTONS_HEIGHT_PERCENTAGE, viewport);
-        setSkeletonPosition(skeletons.get(AnimationType.BUTTON.ordinal()), 0, viewport.getWorldHeight());
+        setSkeletonScale(skeletons.get(AnimationType.BUTTON.ordinal()), Constants.MainAnimationScreen.BUTTONS_WIDTH_PERCENTAGE, Constants.MainAnimationScreen.BUTTONS_HEIGHT_PERCENTAGE, stage.getViewport());
+        setSkeletonPosition(skeletons.get(AnimationType.BUTTON.ordinal()), 0, stage.getViewport().getWorldHeight());
 
         playButtonPressAnimation("1x/pressed", 1f);
     }
@@ -314,34 +305,34 @@ public class MainAnimationScreen extends BaseScreen {
 
         // Render background
         backgroundViewport.apply();
-        batch.setProjectionMatrix(backgroundViewport.getCamera().combined);
-        batch.begin();
-        batch.draw(backgroundTexture, 0, 0, backgroundViewport.getWorldWidth(), backgroundViewport.getWorldHeight());
-        batch.end();
+        game.getBatch().setProjectionMatrix(backgroundViewport.getCamera().combined);
+        game.getBatch().begin();
+        game.getBatch().draw(backgroundTexture, 0, 0, backgroundViewport.getWorldWidth(), backgroundViewport.getWorldHeight());
+        game.getBatch().end();
 
         // Render content
-        viewport.apply();
-        batch.setProjectionMatrix(camera.combined);
-        batch.begin();
-        skeletonRenderer.draw(batch, skeletons.get(AnimationType.COIN.ordinal()));
-        skeletonRenderer.draw(batch, skeletons.get(AnimationType.BUTTON.ordinal()));
-        batch.end();
+        stage.getViewport().apply();
+        game.getBatch().setProjectionMatrix(stage.getCamera().combined);
+        game.getBatch().begin();
+        skeletonRenderer.draw(game.getBatch(), skeletons.get(AnimationType.COIN.ordinal()));
+        skeletonRenderer.draw(game.getBatch(), skeletons.get(AnimationType.BUTTON.ordinal()));
+        game.getBatch().end();
 
         uiViewport.apply();
-        batch.setProjectionMatrix(uiViewport.getCamera().combined);
-        batch.begin();
+        game.getBatch().setProjectionMatrix(uiViewport.getCamera().combined);
+        game.getBatch().begin();
         stage.act(delta);
         stage.draw();
-        batch.end();
+        game.getBatch().end();
 
-        TrailDot.renderTrail(batch, viewport);
+        TrailDot.renderTrail(game.getBatch(), stage.getViewport());
 
         // Render debug bounds
         // renderDebug();
     }
 
     private void renderDebug() {
-        shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.setProjectionMatrix(stage.getCamera().combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(Color.RED);
         drawDebugBounds(Constants.MainAnimationScreen.BUTTON_1X_NAME);
@@ -357,15 +348,15 @@ public class MainAnimationScreen extends BaseScreen {
 
     @Override
     public void resize(int width, int height) {
-        viewport.update(width, height, true);
+        stage.getViewport().update(width, height, true);
         backgroundViewport.update(width, height, true);
         uiViewport.update(width, height, true);
 
-        setSkeletonScale(skeletons.get(AnimationType.COIN.ordinal()), Constants.MainAnimationScreen.COIN_WIDTH_PERCENTAGE, Constants.MainAnimationScreen.COIN_HEIGHT_PERCENTAGE, viewport);  // Adjust the percentages as needed
-        setSkeletonPosition(skeletons.get(AnimationType.COIN.ordinal()), viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2);
+        setSkeletonScale(skeletons.get(AnimationType.COIN.ordinal()), Constants.MainAnimationScreen.COIN_WIDTH_PERCENTAGE, Constants.MainAnimationScreen.COIN_HEIGHT_PERCENTAGE, stage.getViewport());  // Adjust the percentages as needed
+        setSkeletonPosition(skeletons.get(AnimationType.COIN.ordinal()), stage.getViewport().getWorldWidth() / 2, stage.getViewport().getWorldHeight() / 2);
 
-        setSkeletonScale(skeletons.get(AnimationType.BUTTON.ordinal()), Constants.MainAnimationScreen.BUTTONS_WIDTH_PERCENTAGE, Constants.MainAnimationScreen.BUTTONS_HEIGHT_PERCENTAGE, viewport);  // Adjust the percentages as needed
-        setSkeletonPosition(skeletons.get(AnimationType.BUTTON.ordinal()), 0, viewport.getWorldHeight());
+        setSkeletonScale(skeletons.get(AnimationType.BUTTON.ordinal()), Constants.MainAnimationScreen.BUTTONS_WIDTH_PERCENTAGE, Constants.MainAnimationScreen.BUTTONS_HEIGHT_PERCENTAGE, stage.getViewport());  // Adjust the percentages as needed
+        setSkeletonPosition(skeletons.get(AnimationType.BUTTON.ordinal()), 0, stage.getViewport().getWorldHeight());
     }
 
     @Override

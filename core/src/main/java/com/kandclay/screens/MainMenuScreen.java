@@ -15,25 +15,18 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.*;
 import com.esotericsoftware.spine.*;
-import com.kandclay.handlers.SpineAnimationHandler;
 import com.kandclay.utils.Constants;
-import com.kandclay.utils.ScreenType;
 import com.kandclay.utils.TrailDot;
-import de.eskalon.commons.screen.ScreenManager;
 import de.eskalon.commons.screen.transition.impl.SlidingDirection;
 import de.eskalon.commons.screen.transition.impl.SlidingInTransition;
 
 import java.util.HashMap;
-
-import static de.eskalon.commons.screen.transition.impl.SlidingDirection.RIGHT;
 
 public class MainMenuScreen extends BaseScreen {
 
     private boolean isInitialAnimationFinished = false;
     private final boolean debugMode = false;
     private boolean minimapIsOn = true;
-
-    private SpriteBatch batch;
 
     private Stage stage;
     private Stage backgroundStage;
@@ -86,7 +79,6 @@ public class MainMenuScreen extends BaseScreen {
     }
 
     private void initializeCommonComponents() {
-        batch = new SpriteBatch();
         skeletonRenderer = new SkeletonRenderer();
         skeletonRenderer.setPremultipliedAlpha(true);
         shapeRenderer = new ShapeRenderer();
@@ -226,32 +218,32 @@ public class MainMenuScreen extends BaseScreen {
 
     private void renderBackground() {
         backgroundStage.getViewport().apply();
-        batch.setProjectionMatrix(backgroundStage.getViewport().getCamera().combined);
-        batch.begin();
-        batch.draw(backgroundTexture, 0, 0, backgroundStage.getViewport().getWorldWidth(), backgroundStage.getViewport().getWorldHeight());
-        batch.end();
+        game.getBatch().setProjectionMatrix(backgroundStage.getViewport().getCamera().combined);
+        game.getBatch().begin();
+        game.getBatch().draw(backgroundTexture, 0, 0, backgroundStage.getViewport().getWorldWidth(), backgroundStage.getViewport().getWorldHeight());
+        game.getBatch().end();
     }
 
     private void renderMainContent() {
-        renderMenu(batch, stage.getViewport(), AnimationType.MENU_1.ordinal());
+        renderMenu(game.getBatch(), stage.getViewport(), AnimationType.MENU_1.ordinal());
         renderDebug(stage.getViewport(), Color.RED, AnimationType.MENU_1.ordinal());
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
-        TrailDot.renderTrail(batch, stage.getViewport());
+        TrailDot.renderTrail(game.getBatch(), stage.getViewport());
     }
 
     private void renderMinimap() {
         if (!minimapIsOn)
             return;
         minimapStage.getViewport().apply();
-        batch.setProjectionMatrix(minimapStage.getViewport().getCamera().combined);
-        batch.begin();
-        batch.draw(minimapTexture, 0, 0, minimapStage.getViewport().getWorldWidth(), minimapStage.getViewport().getWorldHeight());
-        batch.end();
+        game.getBatch().setProjectionMatrix(minimapStage.getViewport().getCamera().combined);
+        game.getBatch().begin();
+        game.getBatch().draw(minimapTexture, 0, 0, minimapStage.getViewport().getWorldWidth(), minimapStage.getViewport().getWorldHeight());
+        game.getBatch().end();
 
-        renderMenu(batch, minimapStage.getViewport(), AnimationType.MENU_2.ordinal());
+        renderMenu(game.getBatch(), minimapStage.getViewport(), AnimationType.MENU_2.ordinal());
         renderDebug(minimapStage.getViewport(), Color.GREEN, AnimationType.MENU_2.ordinal());
-        TrailDot.renderTrail(batch, minimapStage.getViewport());
+        TrailDot.renderTrail(game.getBatch(), minimapStage.getViewport());
     }
 
     private void renderMenu(SpriteBatch batch, Viewport viewport, int skeletonIndex) {
@@ -299,7 +291,7 @@ public class MainMenuScreen extends BaseScreen {
                         @Override
                         public void run() {
                             Gdx.app.log("MainMenuScreen", "Changing screen to: MainMenuScreen");
-                            game.getScreenManager().pushScreen(new MainAnimationScreen(), new SlidingInTransition(batch, SlidingDirection.DOWN, 1F));
+                            game.getScreenManager().pushScreen(new MainAnimationScreen(), new SlidingInTransition(game.getBatch(), SlidingDirection.DOWN, 1F));
                         }
                     });
                 } else if (animationName.equals("Buttons/SettingsPress")) {
@@ -307,7 +299,7 @@ public class MainMenuScreen extends BaseScreen {
                         @Override
                         public void run() {
                             Gdx.app.log("MainMenuScreen", "Changing screen to: ConfigScreen");
-                            game.getScreenManager().pushScreen(new ConfigurationScreen(), new SlidingInTransition(batch, SlidingDirection.UP, 1F));
+                            game.getScreenManager().pushScreen(new ConfigurationScreen(), new SlidingInTransition(game.getBatch(), SlidingDirection.UP, 1F));
                         }
                     });
                 } else if (animationName.equals("Buttons/QuitPress")) {
@@ -344,12 +336,12 @@ public class MainMenuScreen extends BaseScreen {
         fboMinimap.end();
 
         stage.getViewport().apply();
-        batch.setProjectionMatrix(stage.getViewport().getCamera().combined);
-        batch.begin();
-        batch.draw(fboRegion, 0, 0, stage.getViewport().getWorldWidth(), stage.getViewport().getWorldHeight());
+        game.getBatch().setProjectionMatrix(stage.getViewport().getCamera().combined);
+        game.getBatch().begin();
+        game.getBatch().draw(fboRegion, 0, 0, stage.getViewport().getWorldWidth(), stage.getViewport().getWorldHeight());
         // maintain at stage viewport because the size is handled in renderMinimap()
-        batch.draw(fboRegionMinimap, 0, 0, stage.getViewport().getWorldWidth(), stage.getViewport().getWorldHeight());
-        batch.end();
+        game.getBatch().draw(fboRegionMinimap, 0, 0, stage.getViewport().getWorldWidth(), stage.getViewport().getWorldHeight());
+        game.getBatch().end();
     }
 
     @Override
@@ -409,8 +401,8 @@ public class MainMenuScreen extends BaseScreen {
             minimapStage.dispose();
         if (backgroundStage != null)
             backgroundStage.dispose();
-        if (batch != null) {
-            batch.dispose();
+        if (game.getBatch() != null) {
+            game.getBatch().dispose();
         }
     }
 }
