@@ -48,6 +48,15 @@ dependencies {
   implementation "com.github.crykn.guacamole:gdx-gwt:$guacamoleVersion:sources"
   implementation "com.github.crykn:libgdx-screenmanager:$screenManagerVersion:sources"
   implementation "com.github.tommyettinger:formic:$formicVersion:sources"
+
+  implementation project(':core')
+
+  implementation "com.github.crykn.guacamole:core:$guacamoleVersion:sources"
+  implementation "com.github.crykn.guacamole:gdx:$guacamoleVersion:sources"
+  implementation "com.github.crykn.guacamole:gdx-gwt:$guacamoleVersion"
+  implementation "com.github.crykn.guacamole:gdx-gwt:$guacamoleVersion:sources"
+  implementation "com.github.crykn:libgdx-screenmanager:$screenManagerVersion:sources"
+  implementation "com.github.tommyettinger:formic:$formicVersion:sources"
 }
 
 import org.akhikhl.gretty.AppBeforeIntegrationTestTask

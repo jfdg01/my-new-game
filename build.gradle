@@ -58,6 +58,15 @@ configure(subprojects - project(':android')) {
   }
 }
 
+project(":core") {
+  // ...
+
+  dependencies {
+    // ...
+    api "com.github.crykn:libgdx-screenmanager:$screenManagerVersion"
+  }
+}
+
 subprojects {
   version = '1.0.0'
   ext.appName = 'MyNewGame'

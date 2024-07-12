@@ -2,7 +2,7 @@ package com.kandclay.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
-;import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -24,6 +24,8 @@ import com.kandclay.utils.Constants;
 import com.kandclay.utils.TrailDot;
 
 import java.util.HashMap;
+
+import static com.kandclay.utils.Shaders.createTransition;
 
 public class MainAnimationScreen extends BaseScreen {
 
@@ -73,7 +75,7 @@ public class MainAnimationScreen extends BaseScreen {
         backButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.getScreenManager().pushScreen(new MainMenuScreen(), null);
+                game.getScreenManager().pushScreen(new MainMenuScreen(), createTransition());
             }
         });
 

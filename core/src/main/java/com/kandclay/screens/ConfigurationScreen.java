@@ -14,6 +14,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kandclay.utils.Constants;
 import com.kandclay.utils.TrailDot;
 
+import static com.kandclay.utils.Shaders.createTransition;
+
 public class ConfigurationScreen extends BaseScreen {
     private Slider volumeSlider;
     private TextButton backButton;
@@ -53,7 +55,7 @@ public class ConfigurationScreen extends BaseScreen {
         backButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                // screenManager.setScreen(ScreenType.MENU);
+                game.getScreenManager().pushScreen(new MainMenuScreen(), createTransition());
             }
         });
 

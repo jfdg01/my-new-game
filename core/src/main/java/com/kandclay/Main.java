@@ -46,7 +46,7 @@ public class Main extends ManagedGame<ManagedScreen, ScreenTransition> {
         spineAnimationHandler = new SpineAnimationHandler();
 
         loadInitialAssets();
-        this.screenManager.pushScreen(new MainMenuScreen(), createTransition(Shaders.Transitions.BOWTIE, 1f));
+        this.screenManager.pushScreen(new MainMenuScreen(), createTransition());
     }
 
     private void loadInitialAssets() {

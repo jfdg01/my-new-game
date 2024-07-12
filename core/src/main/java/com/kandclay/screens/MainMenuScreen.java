@@ -294,7 +294,7 @@ public class MainMenuScreen extends BaseScreen {
                         public void run() {
                             Gdx.app.log("MainMenuScreen", "Changing screen to: MainMenuScreen");
                             // game.getScreenManager().pushScreen(new MainAnimationScreen(), new SlidingInTransition(game.getBatch(), SlidingDirection.DOWN, 1F));
-                            game.getScreenManager().pushScreen(new MainAnimationScreen(), createTransition(Shaders.Transitions.WIND, 1f));
+                            game.getScreenManager().pushScreen(new MainAnimationScreen(), createTransition());
                         }
                     });
                 } else if (animationName.equals("Buttons/SettingsPress")) {
@@ -302,7 +302,7 @@ public class MainMenuScreen extends BaseScreen {
                         @Override
                         public void run() {
                             Gdx.app.log("MainMenuScreen", "Changing screen to: ConfigScreen");
-                            game.getScreenManager().pushScreen(new ConfigurationScreen(), createTransition(Shaders.Transitions.HEART, 1f));
+                            game.getScreenManager().pushScreen(new ConfigurationScreen(), createTransition());
                         }
                     });
                 } else if (animationName.equals("Buttons/QuitPress")) {
