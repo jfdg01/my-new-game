@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -16,12 +17,14 @@ import com.kandclay.managers.ConfigurationManager;
 import com.kandclay.managers.MyAssetManager;
 import com.kandclay.screens.MainMenuScreen;
 import com.kandclay.utils.Constants;
+import com.kandclay.utils.Shaders;
 import de.eskalon.commons.core.ManagedGame;
 import de.eskalon.commons.screen.ManagedScreen;
 import de.eskalon.commons.screen.transition.ScreenTransition;
-import de.eskalon.commons.screen.transition.impl.SlidingInTransition;
 
-import static de.eskalon.commons.screen.transition.impl.SlidingDirection.RIGHT;
+import javax.print.DocFlavor;
+
+import static com.kandclay.utils.Shaders.createTransition;
 
 public class Main extends ManagedGame<ManagedScreen, ScreenTransition> {
 
@@ -43,7 +46,7 @@ public class Main extends ManagedGame<ManagedScreen, ScreenTransition> {
         spineAnimationHandler = new SpineAnimationHandler();
 
         loadInitialAssets();
-        this.screenManager.pushScreen(new MainMenuScreen(), new SlidingInTransition(batch, RIGHT, 1F));
+        this.screenManager.pushScreen(new MainMenuScreen(), createTransition(Shaders.Transitions.BOWTIE, 1f));
     }
 
     private void loadInitialAssets() {

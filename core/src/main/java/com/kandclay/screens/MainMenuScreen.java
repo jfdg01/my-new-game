@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -16,11 +17,12 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.*;
 import com.esotericsoftware.spine.*;
 import com.kandclay.utils.Constants;
+import com.kandclay.utils.Shaders;
 import com.kandclay.utils.TrailDot;
-import de.eskalon.commons.screen.transition.impl.SlidingDirection;
-import de.eskalon.commons.screen.transition.impl.SlidingInTransition;
 
 import java.util.HashMap;
+
+import static com.kandclay.utils.Shaders.createTransition;
 
 public class MainMenuScreen extends BaseScreen {
 
@@ -291,7 +293,8 @@ public class MainMenuScreen extends BaseScreen {
                         @Override
                         public void run() {
                             Gdx.app.log("MainMenuScreen", "Changing screen to: MainMenuScreen");
-                            game.getScreenManager().pushScreen(new MainAnimationScreen(), new SlidingInTransition(game.getBatch(), SlidingDirection.DOWN, 1F));
+                            // game.getScreenManager().pushScreen(new MainAnimationScreen(), new SlidingInTransition(game.getBatch(), SlidingDirection.DOWN, 1F));
+                            game.getScreenManager().pushScreen(new MainAnimationScreen(), createTransition(Shaders.Transitions.WIND, 1f));
                         }
                     });
                 } else if (animationName.equals("Buttons/SettingsPress")) {
@@ -299,7 +302,7 @@ public class MainMenuScreen extends BaseScreen {
                         @Override
                         public void run() {
                             Gdx.app.log("MainMenuScreen", "Changing screen to: ConfigScreen");
-                            game.getScreenManager().pushScreen(new ConfigurationScreen(), new SlidingInTransition(game.getBatch(), SlidingDirection.UP, 1F));
+                            game.getScreenManager().pushScreen(new ConfigurationScreen(), createTransition(Shaders.Transitions.HEART, 1f));
                         }
                     });
                 } else if (animationName.equals("Buttons/QuitPress")) {
