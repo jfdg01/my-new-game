@@ -101,7 +101,8 @@ public class Constants {
     }
 
     public static class Background {
-        public static final String PATH = "background.jpg";
+        public static final String PATH_1 = "background.jpg";
+        public static final String PATH_2 = "vp/texture.png";
     }
 
     public class Frame {

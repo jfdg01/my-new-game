@@ -1,12 +1,14 @@
 package com.kandclay.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -57,7 +59,7 @@ public class MainAnimationScreen extends BaseScreen {
 
         skeletonRenderer = new SkeletonRenderer();
         skeletonRenderer.setPremultipliedAlpha(true);
-        Texture texture = game.getAssetManager().get(Constants.Background.PATH, Texture.class);
+        Texture texture = game.getAssetManager().get(Constants.Background.PATH_2, Texture.class);
         backgroundTexture = new TextureRegion(texture);
         backgroundViewport = new ExtendViewport(Constants.General.EMBED_WIDTH, Constants.General.EMBED_HEIGHT);
 
@@ -170,6 +172,15 @@ public class MainAnimationScreen extends BaseScreen {
         });
 
         InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(new InputAdapter() {
+            @Override
+            public boolean mouseMoved(int screenX, int screenY) {
+                Vector2 coords = stage.getViewport().unproject(new Vector2(screenX, screenY));
+                TrailDot.createTrailDot(coords.x, coords.y, stage.getViewport());
+                return false;
+            }
+        });
+
         multiplexer.addProcessor(stage);
         Gdx.input.setInputProcessor(multiplexer);
     }
@@ -212,7 +223,6 @@ public class MainAnimationScreen extends BaseScreen {
     private void swapCoinAnimation(float stateTime) {
         configureCoinAnimation(stateTime, false);
     }
-
 
     private void initializeButtonAnimations() {
         String atlasPath = Constants.MainAnimationScreen.ATLAS;

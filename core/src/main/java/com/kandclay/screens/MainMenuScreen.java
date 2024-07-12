@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -17,7 +16,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.*;
 import com.esotericsoftware.spine.*;
 import com.kandclay.utils.Constants;
-import com.kandclay.utils.Shaders;
 import com.kandclay.utils.TrailDot;
 
 import java.util.HashMap;
@@ -94,7 +92,7 @@ public class MainMenuScreen extends BaseScreen {
     }
 
     private void initializeBackground() {
-        Texture texture = game.getAssetManager().get(Constants.Background.PATH, Texture.class);
+        Texture texture = game.getAssetManager().get(Constants.Background.PATH_1, Texture.class);
         backgroundTexture = new TextureRegion(texture);
         Viewport backgroundViewport = new ExtendViewport(Constants.General.EMBED_WIDTH, Constants.General.EMBED_HEIGHT);
         backgroundStage = new Stage(backgroundViewport);

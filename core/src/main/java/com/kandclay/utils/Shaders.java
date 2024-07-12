@@ -313,9 +313,7 @@ public class Shaders {
 
     private static Interpolation getRandomInterpolation() {
         Interpolation[] interpolations = new Interpolation[] {
-            Interpolation.bounce,
             Interpolation.circle,
-            Interpolation.elastic,
             Interpolation.exp10,
             Interpolation.exp5,
             Interpolation.fade,
@@ -325,7 +323,6 @@ public class Shaders {
             Interpolation.pow4,
             Interpolation.pow5,
             Interpolation.sine,
-            Interpolation.swing
         };
         Interpolation interpolation = interpolations[(int) (Math.random() * interpolations.length)];
         Gdx.app.log("Shaders", "Using interpolation: " + interpolation.getClass());

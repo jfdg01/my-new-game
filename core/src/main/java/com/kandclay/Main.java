@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -17,12 +16,9 @@ import com.kandclay.managers.ConfigurationManager;
 import com.kandclay.managers.MyAssetManager;
 import com.kandclay.screens.MainMenuScreen;
 import com.kandclay.utils.Constants;
-import com.kandclay.utils.Shaders;
 import de.eskalon.commons.core.ManagedGame;
 import de.eskalon.commons.screen.ManagedScreen;
 import de.eskalon.commons.screen.transition.ScreenTransition;
-
-import javax.print.DocFlavor;
 
 import static com.kandclay.utils.Shaders.createTransition;
 
@@ -55,7 +51,7 @@ public class Main extends ManagedGame<ManagedScreen, ScreenTransition> {
         assetManager.load(Constants.TrailDot.ATLAS, TextureAtlas.class);
         assetManager.load(Constants.MainAnimationScreen.YellowCoin.ATLAS, TextureAtlas.class);
         assetManager.load(Constants.MainAnimationScreen.RedCoin.ATLAS, TextureAtlas.class);
-        assetManager.load(Constants.Background.PATH, Texture.class);
+        assetManager.load(Constants.Background.PATH_1, Texture.class);
         assetManager.load(Constants.MainAnimationScreen.ATLAS, TextureAtlas.class);
         assetManager.load(Constants.Minimap.PATH, Texture.class);
 
