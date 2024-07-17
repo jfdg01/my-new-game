@@ -1,0 +1,982 @@
+
+
+
+public abstract class BaseScreen extends ManagedScreen {
+
+    protected Main game;
+    protected ShapeRenderer shapeRenderer;
+
+    protected SkeletonRenderer skeletonRenderer;
+    protected Array<AnimationState> states;
+    protected Array<Skeleton> skeletons;
+    protected HashMap<String, Boolean> hoverStates;
+
+    public BaseScreen() {
+        game = (Main) Gdx.app.getApplicationListener();
+        this.skeletons = new Array<Skeleton>();
+        this.states = new Array<AnimationState>();
+
+        TrailDot.setSpineAnimationHandler(game.getSpineAnimationHandler());
+    }
+
+    public void addTrailToStage(final Stage stage, final Viewport viewport) {
+        stage.addListener(new InputListener() {
+            @Override
+            public boolean mouseMoved(InputEvent event, float x, float y) {
+                TrailDot.createTrailDot(x, y, viewport);
+                return false;
+            }
+        });
+    }
+
+    @Override
+    public void show() {
+
+    }
+
+    public void clearScreen() {
+        Gdx.gl.glClearColor(0, 0, 0, 0);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+    }
+
+    @Override
+    public void render(float delta) {
+        clearScreen();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+
+    }
+
+    @Override
+    public void pause() {
+        // Override in subclasses if needed
+    }
+
+    @Override
+    public void resume() {
+        // Override in subclasses if needed
+    }
+
+    @Override
+    public void hide() {
+        // Override in subclasses to hide the screen
+    }
+
+    @Override
+    public void dispose() {
+        if (shapeRenderer != null) {
+            shapeRenderer.dispose();
+        }
+    }
+
+    protected void setSkeletonScale(Skeleton skeleton, float widthPercentage, float heightPercentage, Viewport viewport) {
+        if (skeleton != null) {
+            float screenWidth = viewport.getWorldWidth();
+            float screenHeight = viewport.getWorldHeight();
+
+            float skeletonWidth = screenWidth * widthPercentage;
+            float skeletonHeight = screenHeight * heightPercentage;
+
+            float scaleX = skeletonWidth / skeleton.getData().getWidth();
+            float scaleY = skeletonHeight / skeleton.getData().getHeight();
+
+            float scale = Math.min(scaleX, scaleY);
+
+            skeleton.setScale(scale, scale);
+        }
+    }
+
+    protected boolean isHoveringButton(float x, float y, String buttonName, int pos) {
+        Rectangle buttonBounds = getButtonBounds(buttonName, pos);
+        return buttonBounds.contains(x, y);
+    }
+
+    protected Rectangle getButtonBounds(String buttonName, int pos) {
+        return getRectangle(buttonName, buttonName, skeletons.get(pos));
+    }
+
+    protected void updateHoverState(float x, float y, String buttonName, int pos, int trackIndex, String hoverInAnim, String hoverOutAnim) {
+        boolean isHovered = isHoveringButton(x, y, buttonName, pos);
+        boolean wasHovered = hoverStates.get(buttonName);
+
+        if (isHovered && !wasHovered) {
+            states.get(pos).setAnimation(trackIndex, hoverInAnim, false);
+        } else if (!isHovered && wasHovered) {
+            states.get(pos).setAnimation(trackIndex, hoverOutAnim, false);
+        }
+
+        hoverStates.put(buttonName, isHovered);
+    }
+
+    protected Rectangle getRectangle(String buttonName, String bgSlotName, Skeleton skeleton) {
+        Bone bone = skeleton.findBone(buttonName);
+        if (bone == null) return new Rectangle();
+
+        Slot slot = skeleton.findSlot(bgSlotName);  // Use the background slot
+        if (slot == null || !(slot.getAttachment() instanceof RegionAttachment)) return new Rectangle();
+
+        RegionAttachment attachment = (RegionAttachment) slot.getAttachment();
+        if (attachment == null) return new Rectangle();
+
+        float[] vertices = new float[8];
+        attachment.computeWorldVertices(slot.getBone(), vertices, 0, 2);
+
+        float minX = vertices[0];
+        float minY = vertices[1];
+        float maxX = vertices[0];
+        float maxY = vertices[1];
+
+        for (int i = 2; i < vertices.length; i += 2) {
+            if (vertices[i] < minX) minX = vertices[i];
+            if (vertices[i + 1] < minY) minY = vertices[i + 1];
+            if (vertices[i] > maxX) maxX = vertices[i];
+            if (vertices[i + 1] > maxY) maxY = vertices[i + 1];
+        }
+
+        return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+    }
+
+    protected void setSkeletonPosition(Skeleton skeleton, float x, float y) {
+        if (skeleton != null) {
+            skeleton.setPosition(x, y);
+        }
+    }
+}
+
+
+
+
+public class ConfigurationScreen extends BaseScreen {
+    private Slider volumeSlider;
+    private TextButton backButton;
+    private TextButton coinColorButton;
+    private boolean isYellowCoin;
+    private Stage stage;
+
+    public ConfigurationScreen() {
+        super();
+    }
+
+    @Override
+    public void show() {
+        Camera camera = new OrthographicCamera();
+        Viewport viewport = new ScreenViewport(camera);
+        stage = new Stage(viewport);
+
+        Skin skin = game.getAssetManager().get(Constants.Skin.JSON, Skin.class);
+        float savedVolume = game.getConfigManager().getPreference("volume", Constants.Audio.DEFAULT_VOLUME);
+        isYellowCoin = game.getConfigManager().getPreference("coinColor", true);
+        final int[] currentInterpolation = {game.getConfigManager().getPreference("interpolation", 6)};
+
+        volumeSlider = new Slider(0, 1, 0.01f, false, skin);
+        volumeSlider.setValue(savedVolume);
+        volumeSlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                float volume = volumeSlider.getValue();
+                game.getAudioManager().setVolume(volume);
+                game.getConfigManager().setPreference("volume", volume);
+            }
+        });
+
+        backButton = new TextButton("Back", skin, Constants.Font.BUTTON);
+        backButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.getScreenManager().pushScreen(new MainMenuScreen(), createTransition());
+            }
+        });
+
+        coinColorButton = new TextButton("Coin Color: " + (isYellowCoin ? "Yellow" : "Red"), skin, Constants.Font.BUTTON);
+        coinColorButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                isYellowCoin = !isYellowCoin;
+                coinColorButton.setText("Coin Color: " + (isYellowCoin ? "Yellow" : "Red"));
+                game.getConfigManager().setPreference("coinColor", isYellowCoin);
+            }
+        });
+
+        Table table = new Table();
+        table.setFillParent(true);
+        table.center();
+        table.add(new Label("Options", skin, Constants.Font.LABEL)).padBottom(Constants.UIButtons.PADDING).row();
+        table.add(new Label("Volume", skin, Constants.Font.LABEL)).padBottom(Constants.UIButtons.PADDING).row();
+        table.add(volumeSlider).width(Constants.UIButtons.SLIDER_WIDTH).padBottom(Constants.UIButtons.PADDING).row();
+        table.add(coinColorButton).width(Constants.UIButtons.CONTROL_BUTTON_WIDTH).height(Constants.UIButtons.CONTROL_BUTTON_HEIGHT).padBottom(Constants.UIButtons.PADDING).row();
+        table.add(backButton).width(Constants.UIButtons.BACK_BUTTON_WIDTH).height(Constants.UIButtons.CONTROL_BUTTON_HEIGHT).padTop(Constants.UIButtons.PADDING);
+
+        stage.addActor(table);
+
+        viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(stage);
+        Gdx.input.setInputProcessor(multiplexer);
+    }
+
+    @Override
+    public void render(float delta) {
+        super.render(delta);
+        clearScreen();
+
+        stage.getViewport().apply();
+        game.getBatch().setProjectionMatrix(stage.getViewport().getCamera().combined);
+
+        stage.act(delta);
+        stage.draw();
+
+        TrailDot.renderTrail( game.getBatch(), stage.getViewport());
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        stage.getViewport().update(width, height, true);
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+    }
+}
+
+
+
+
+
+
+public class MainAnimationScreen extends BaseScreen {
+
+    private boolean isYellowCoin;
+    private boolean isLooping = true;
+    private float speedMultiplier = 1f;
+    private float lastSliderValue = 0f;
+
+    private Stage stage;
+
+    private TextureRegion backgroundTexture;
+    private Viewport backgroundViewport;
+
+    private Viewport uiViewport;
+
+    private enum AnimationType {
+        COIN, BUTTON
+    }
+
+    public MainAnimationScreen() {
+        super();
+    }
+
+    @Override
+    public void show() {
+
+        Viewport viewport = new ExtendViewport(Constants.General.EMBED_WIDTH, Constants.General.EMBED_HEIGHT);
+        stage = new Stage(viewport);
+
+        skeletonRenderer = new SkeletonRenderer();
+        skeletonRenderer.setPremultipliedAlpha(true);
+        Texture texture = game.getAssetManager().get(Constants.Background.PATH_2, Texture.class);
+        backgroundTexture = new TextureRegion(texture);
+        backgroundViewport = new ExtendViewport(Constants.General.EMBED_WIDTH, Constants.General.EMBED_HEIGHT);
+
+        uiViewport = new ExtendViewport(Constants.General.EMBED_WIDTH, Constants.General.EMBED_HEIGHT);
+
+        shapeRenderer = new ShapeRenderer();
+
+        isYellowCoin = game.getConfigManager().getPreference("coinColor", true);
+        initializeCoinAnimations();
+        initializeButtonAnimations();
+
+        Skin skin = game.getAssetManager().get(Constants.Skin.JSON, Skin.class);
+
+        TextButton backButton = new TextButton("Back to Menu", skin, Constants.Font.BUTTON);
+        backButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.getScreenManager().pushScreen(new MainMenuScreen(), createTransition());
+            }
+        });
+
+        final Slider slider = new Slider(0, 1, 0.01f, false, skin);
+        slider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if (!isLooping) {
+                    float progress = slider.getValue();
+                    float animationDuration = states.get(AnimationType.COIN.ordinal()).getCurrent(0).getAnimation().getDuration();
+                    states.get(AnimationType.COIN.ordinal()).getCurrent(0).setTrackTime(progress * animationDuration);
+                    if (progress != lastSliderValue) {
+                        lastSliderValue = progress;
+                        System.out.println("Slider changed: " + slider.getValue() + " Mode: Manual");
+                    }
+                }
+            }
+        });
+
+        final TextButton modeButton = new TextButton("Switch to Manual Mode", skin, Constants.Font.BUTTON);
+        modeButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                isLooping = !isLooping;
+                System.out.println("Mode changed to: " + (isLooping ? "Automatic" : "Manual"));
+                if (isLooping) {
+                    modeButton.setText("Switch to Manual Mode");
+                    states.get(AnimationType.COIN.ordinal()).setAnimation(0, "animation", true);
+                } else {
+                    modeButton.setText("Switch to Automatic Mode");
+                }
+            }
+        });
+
+        TextButton changeCoinColorButton = new TextButton("Change Coin Color", skin, Constants.Font.BUTTON);
+        changeCoinColorButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                swapCoinColor();
+            }
+        });
+
+        // New button to swap skins
+        TextButton swapSkinsButton = new TextButton("Swap Skins", skin, Constants.Font.BUTTON);
+        swapSkinsButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                swapSkins();
+            }
+        });
+
+        Table bottomTable = new Table();
+        bottomTable.setFillParent(true);
+        bottomTable.bottom();
+        bottomTable.add(slider).width(Constants.UIButtons.SLIDER_WIDTH).padBottom(Constants.UIButtons.PADDING);
+        bottomTable.row();
+        bottomTable.add(modeButton).padBottom(Constants.UIButtons.PADDING);
+
+        Table backButtonTable = new Table();
+        backButtonTable.setFillParent(true);
+        backButtonTable.bottom().left();
+        backButtonTable.add(backButton).width(Constants.UIButtons.BACK_BUTTON_WIDTH).height(Constants.UIButtons.CONTROL_BUTTON_HEIGHT).pad(Constants.UIButtons.PADDING);
+
+        Table topTable = new Table();
+        topTable.setFillParent(true);
+        topTable.top();
+        topTable.add(changeCoinColorButton).pad(Constants.UIButtons.PADDING);
+        topTable.row();
+        topTable.add(swapSkinsButton).pad(Constants.UIButtons.PADDING);  // Add the new button to the layout
+
+        stage.addActor(bottomTable);
+        stage.addActor(backButtonTable);
+        stage.addActor(topTable);
+
+        hoverStates = new HashMap<String, Boolean>();
+        hoverStates.put(Constants.MainAnimationScreen.BUTTON_1X_NAME, false);
+        hoverStates.put(Constants.MainAnimationScreen.BUTTON_2X_NAME, false);
+        hoverStates.put(Constants.MainAnimationScreen.BUTTON_3X__NAME, false);
+
+        stage.addListener(new InputListener() {
+            @Override
+            public boolean mouseMoved(InputEvent event, float x, float y) {
+                handleHover(x, y);
+                return true;
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                handleClick(x, y);
+                return true;
+            }
+        });
+
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(new InputAdapter() {
+            @Override
+            public boolean mouseMoved(int screenX, int screenY) {
+                Vector2 coords = stage.getViewport().unproject(new Vector2(screenX, screenY));
+                TrailDot.createTrailDot(coords.x, coords.y, stage.getViewport());
+                return false;
+            }
+        });
+
+        multiplexer.addProcessor(stage);
+        Gdx.input.setInputProcessor(multiplexer);
+    }
+
+    private void swapCoinColor() {
+        float currentStateTime = states.get(AnimationType.COIN.ordinal()).getCurrent(0).getTrackTime();
+        isYellowCoin = !isYellowCoin;
+        game.getConfigManager().setPreference("coinColor", isYellowCoin);
+        swapCoinAnimation(currentStateTime);
+    }
+
+    private void configureCoinAnimation(float stateTime, boolean isAddOperation) {
+        String atlasPath = isYellowCoin ? Constants.MainAnimationScreen.YellowCoin.ATLAS : Constants.MainAnimationScreen.RedCoin.ATLAS;
+        String skeletonPath = isYellowCoin ? Constants.MainAnimationScreen.YellowCoin.JSON : Constants.MainAnimationScreen.RedCoin.JSON;
+
+        if (isAddOperation) {
+            skeletons.insert(AnimationType.COIN.ordinal(), game.getSpineAnimationHandler().createSkeleton(atlasPath, skeletonPath));
+            states.insert(AnimationType.COIN.ordinal(), game.getSpineAnimationHandler().createAnimationState(skeletons.get(AnimationType.COIN.ordinal())));
+        } else {
+            skeletons.set(AnimationType.COIN.ordinal(), game.getSpineAnimationHandler().createSkeleton(atlasPath, skeletonPath));
+            states.set(AnimationType.COIN.ordinal(), game.getSpineAnimationHandler().createAnimationState(skeletons.get(AnimationType.COIN.ordinal())));
+        }
+
+        setSkeletonScale(skeletons.get(AnimationType.COIN.ordinal()), Constants.MainAnimationScreen.COIN_WIDTH_PERCENTAGE, Constants.MainAnimationScreen.COIN_HEIGHT_PERCENTAGE, stage.getViewport());
+        setSkeletonPosition(skeletons.get(AnimationType.COIN.ordinal()), stage.getViewport().getWorldWidth() / 2, stage.getViewport().getWorldHeight() / 2);
+        states.get(AnimationType.COIN.ordinal()).setAnimation(0, "animation", true);
+        states.get(AnimationType.COIN.ordinal()).getCurrent(0).setTrackTime(stateTime);
+        states.get(AnimationType.COIN.ordinal()).addListener(new AnimationState.AnimationStateAdapter() {
+            @Override
+            public void complete(AnimationState.TrackEntry entry) {
+                System.out.println("Animation completed");
+            }
+        });
+    }
+
+    private void initializeCoinAnimations() {
+        configureCoinAnimation((float) 0.0, true);
+    }
+
+    private void swapCoinAnimation(float stateTime) {
+        configureCoinAnimation(stateTime, false);
+    }
+
+    private void initializeButtonAnimations() {
+        String atlasPath = Constants.MainAnimationScreen.ATLAS;
+        String skeletonPath = Constants.MainAnimationScreen.JSON;
+
+        skeletons.insert(AnimationType.BUTTON.ordinal(), game.getSpineAnimationHandler().createSkeleton(atlasPath, skeletonPath));
+        states.insert(AnimationType.BUTTON.ordinal(), game.getSpineAnimationHandler().createAnimationState(skeletons.get(AnimationType.BUTTON.ordinal())));
+
+        setSkeletonScale(skeletons.get(AnimationType.BUTTON.ordinal()), Constants.MainAnimationScreen.BUTTONS_WIDTH_PERCENTAGE, Constants.MainAnimationScreen.BUTTONS_HEIGHT_PERCENTAGE, stage.getViewport());
+        setSkeletonPosition(skeletons.get(AnimationType.BUTTON.ordinal()), 0, stage.getViewport().getWorldHeight());
+
+        playButtonPressAnimation("1x/pressed", 1f);
+    }
+
+    private void handleHover(float x, float y) {
+        updateHoverState(x, y, Constants.MainAnimationScreen.BUTTON_1X_NAME, AnimationType.BUTTON.ordinal(), 1, "1x/hoverIn", "1x/hoverOut");
+        updateHoverState(x, y, Constants.MainAnimationScreen.BUTTON_2X_NAME, AnimationType.BUTTON.ordinal(), 2, "2x/hoverIn", "2x/hoverOut");
+        updateHoverState(x, y, Constants.MainAnimationScreen.BUTTON_3X__NAME, AnimationType.BUTTON.ordinal(), 3, "3x/hoverIn", "3x/hoverOut");
+    }
+
+    private void swapSkins() {
+        String currentSkin = skeletons.get(AnimationType.BUTTON.ordinal()).getSkin().getName();
+        String newSkin = currentSkin.equals("Saturated") ? "Accessible" : "Saturated";
+        skeletons.get(AnimationType.BUTTON.ordinal()).setSkin(newSkin);
+    }
+
+    private void handleClick(float x, float y) {
+        if (isHoveringButton(x, y, Constants.MainAnimationScreen.BUTTON_1X_NAME, AnimationType.BUTTON.ordinal())) {
+            playButtonPressAnimation("1x/pressed", 1f);
+        } else if (isHoveringButton(x, y, Constants.MainAnimationScreen.BUTTON_2X_NAME, AnimationType.BUTTON.ordinal())) {
+            playButtonPressAnimation("2x/pressed", 2f);
+        } else if (isHoveringButton(x, y, Constants.MainAnimationScreen.BUTTON_3X__NAME, AnimationType.BUTTON.ordinal())) {
+            playButtonPressAnimation("3x/pressed", 3f);
+        }
+    }
+
+    private void playButtonPressAnimation(final String animationName, final float speed) {
+        Gdx.app.log("MainAnimationScreen", "Playing button press animation: " + animationName);
+        states.get(AnimationType.BUTTON.ordinal()).setAnimation(4, animationName, false).setListener(new AnimationState.AnimationStateListener() {
+            @Override
+            public void start(AnimationState.TrackEntry entry) {
+            }
+
+            @Override
+            public void interrupt(AnimationState.TrackEntry entry) {
+            }
+
+            @Override
+            public void end(AnimationState.TrackEntry entry) {
+            }
+
+            @Override
+            public void dispose(AnimationState.TrackEntry entry) {
+            }
+
+            @Override
+            public void complete(AnimationState.TrackEntry entry) {
+                Gdx.app.log("MainAnimationScreen", "Animation complete: " + animationName);
+                speedMultiplier = speed;
+            }
+
+            @Override
+            public void event(AnimationState.TrackEntry entry, Event event) {
+            }
+        });
+    }
+
+    @Override
+    protected Rectangle getButtonBounds(String buttonName, int pos) {
+        String bgSlotName = "bg-" + buttonName;
+        return getRectangle(buttonName, bgSlotName, skeletons.get(pos));
+    }
+
+    @Override
+    public void render(float delta) {
+        clearScreen();
+
+        if (isLooping) {
+            states.get(AnimationType.COIN.ordinal()).update(delta * speedMultiplier);
+        }
+
+        states.get(AnimationType.COIN.ordinal()).apply(skeletons.get(AnimationType.COIN.ordinal()));
+        skeletons.get(AnimationType.COIN.ordinal()).updateWorldTransform();
+
+        states.get(AnimationType.BUTTON.ordinal()).update(delta);
+        states.get(AnimationType.BUTTON.ordinal()).apply(skeletons.get(AnimationType.BUTTON.ordinal()));
+        skeletons.get(AnimationType.BUTTON.ordinal()).updateWorldTransform();
+
+        // Render background
+        backgroundViewport.apply();
+        game.getBatch().setProjectionMatrix(backgroundViewport.getCamera().combined);
+        game.getBatch().begin();
+        game.getBatch().draw(backgroundTexture, 0, 0, backgroundViewport.getWorldWidth(), backgroundViewport.getWorldHeight());
+        game.getBatch().end();
+
+        // Render content
+        stage.getViewport().apply();
+        game.getBatch().setProjectionMatrix(stage.getCamera().combined);
+        game.getBatch().begin();
+        skeletonRenderer.draw(game.getBatch(), skeletons.get(AnimationType.COIN.ordinal()));
+        skeletonRenderer.draw(game.getBatch(), skeletons.get(AnimationType.BUTTON.ordinal()));
+        game.getBatch().end();
+
+        uiViewport.apply();
+        game.getBatch().setProjectionMatrix(uiViewport.getCamera().combined);
+        game.getBatch().begin();
+        stage.act(delta);
+        stage.draw();
+        game.getBatch().end();
+
+        TrailDot.renderTrail(game.getBatch(), stage.getViewport());
+
+        // Render debug bounds
+        // renderDebug();
+    }
+
+    private void renderDebug() {
+        shapeRenderer.setProjectionMatrix(stage.getCamera().combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.RED);
+        drawDebugBounds(Constants.MainAnimationScreen.BUTTON_1X_NAME);
+        drawDebugBounds(Constants.MainAnimationScreen.BUTTON_2X_NAME);
+        drawDebugBounds(Constants.MainAnimationScreen.BUTTON_3X__NAME);
+        shapeRenderer.end();
+    }
+
+    private void drawDebugBounds(String buttonName) {
+        Rectangle bounds = getButtonBounds(buttonName, AnimationType.BUTTON.ordinal());
+        shapeRenderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        stage.getViewport().update(width, height, true);
+        backgroundViewport.update(width, height, true);
+        uiViewport.update(width, height, true);
+
+        setSkeletonScale(skeletons.get(AnimationType.COIN.ordinal()), Constants.MainAnimationScreen.COIN_WIDTH_PERCENTAGE, Constants.MainAnimationScreen.COIN_HEIGHT_PERCENTAGE, stage.getViewport());  // Adjust the percentages as needed
+        setSkeletonPosition(skeletons.get(AnimationType.COIN.ordinal()), stage.getViewport().getWorldWidth() / 2, stage.getViewport().getWorldHeight() / 2);
+
+        setSkeletonScale(skeletons.get(AnimationType.BUTTON.ordinal()), Constants.MainAnimationScreen.BUTTONS_WIDTH_PERCENTAGE, Constants.MainAnimationScreen.BUTTONS_HEIGHT_PERCENTAGE, stage.getViewport());  // Adjust the percentages as needed
+        setSkeletonPosition(skeletons.get(AnimationType.BUTTON.ordinal()), 0, stage.getViewport().getWorldHeight());
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+    }
+}
+
+
+
+
+
+public class MainMenuScreen extends BaseScreen {
+
+    private boolean isInitialAnimationFinished = false;
+    private final boolean debugMode = false;
+    private boolean minimapIsOn = true;
+
+    private Stage stage;
+    private Stage backgroundStage;
+    private Stage minimapStage;
+
+    private FrameBuffer fbo;
+    private TextureRegion fboRegion;
+
+    private FrameBuffer fboMinimap;
+    private TextureRegion fboRegionMinimap;
+
+    private TextureRegion backgroundTexture;
+    private TextureRegion minimapTexture;
+
+    private enum AnimationType {
+        MENU_1, MENU_2
+    }
+
+    public MainMenuScreen() {
+        super();
+    }
+
+    @Override
+    public void show() {
+        initializeCommonComponents();
+        initializeBackground();
+        initializeMainContent();
+        initializeMinimap();
+        setupInputProcessing();
+    }
+
+    private void createFBO(int width, int height) {
+        if (fbo != null) {
+            fbo.dispose();
+        }
+        fbo = new FrameBuffer(Pixmap.Format.RGBA8888, width, height, false);
+        fboRegion = new TextureRegion(fbo.getColorBufferTexture());
+        fboRegion.flip(false, true);
+    }
+
+    private void createFBOMinimap(int width, int height) {
+        if (!minimapIsOn)
+            return;
+        if (fboMinimap != null) {
+            fboMinimap.dispose();
+        }
+        fboMinimap = new FrameBuffer(Pixmap.Format.RGBA8888, width, height, false);
+        fboRegionMinimap = new TextureRegion(fboMinimap.getColorBufferTexture());
+        fboRegionMinimap.flip(false, true);
+    }
+
+    private void initializeCommonComponents() {
+        skeletonRenderer = new SkeletonRenderer();
+        skeletonRenderer.setPremultipliedAlpha(true);
+        shapeRenderer = new ShapeRenderer();
+
+        hoverStates = new HashMap<String, Boolean>();
+        hoverStates.put(Constants.MainMenuScreen.BUTTON_PLAY_NAME, false);
+        hoverStates.put(Constants.MainMenuScreen.BUTTON_QUIT_NAME, false);
+        hoverStates.put(Constants.MainMenuScreen.BUTTON_STGS_NAME, false);
+
+        initializeAnimations();
+    }
+
+    private void initializeBackground() {
+        Texture texture = game.getAssetManager().get(Constants.Background.PATH_1, Texture.class);
+        backgroundTexture = new TextureRegion(texture);
+        Viewport backgroundViewport = new ExtendViewport(Constants.General.EMBED_WIDTH, Constants.General.EMBED_HEIGHT);
+        backgroundStage = new Stage(backgroundViewport);
+    }
+
+    private void initializeMainContent() {
+        Viewport viewport = new ExtendViewport(Constants.General.EMBED_WIDTH, Constants.General.EMBED_HEIGHT);
+        stage = new Stage(viewport);
+        stage.addListener(createStageInputListener(AnimationType.MENU_1.ordinal()));
+    }
+
+    private void initializeMinimap() {
+        if (!minimapIsOn)
+            return;
+        Texture texture = game.getAssetManager().get(Constants.Minimap.PATH, Texture.class);
+        minimapTexture = new TextureRegion(texture);
+        Viewport minimapViewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        minimapStage = new Stage(minimapViewport);
+        minimapStage.addListener(createStageInputListener(AnimationType.MENU_2.ordinal()));
+
+    }
+
+    private void setupInputProcessing() {
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(new InputAdapter() {
+            @Override
+            public boolean mouseMoved(int screenX, int screenY) {
+                Vector2 coords = stage.getViewport().unproject(new Vector2(screenX, screenY));
+                TrailDot.createTrailDot(coords.x, coords.y, stage.getViewport());
+
+                if (minimapIsOn) {
+                    coords = minimapStage.getViewport().unproject(new Vector2(screenX, screenY));
+                    TrailDot.createTrailDot(coords.x, coords.y, minimapStage.getViewport());
+                }
+
+                return false;
+            }
+        });
+        if (minimapIsOn)
+            multiplexer.addProcessor(minimapStage);
+        multiplexer.addProcessor(stage);
+        Gdx.input.setInputProcessor(multiplexer);
+    }
+
+    private InputListener createStageInputListener(final int skeletonIndex) {
+        return new InputListener() {
+            @Override
+            public boolean mouseMoved(InputEvent event, float x, float y) {
+                if (isInitialAnimationFinished) {
+                    handleHover(x, y, skeletonIndex);
+                }
+                return true;
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                handleClick(x, y, skeletonIndex);
+                return true;
+            }
+        };
+    }
+
+    private void handleHover(float x, float y, int skeletonIndex) {
+        updateHoverState(x, y, Constants.MainMenuScreen.BUTTON_PLAY_NAME, skeletonIndex, 1, "Buttons/PlayHoverIn", "Buttons/PlayHoverOut");
+        updateHoverState(x, y, Constants.MainMenuScreen.BUTTON_QUIT_NAME, skeletonIndex, 2, "Buttons/QuitHoverIn", "Buttons/QuitHoverOut");
+        updateHoverState(x, y, Constants.MainMenuScreen.BUTTON_STGS_NAME, skeletonIndex, 3, "Buttons/SettingsHoverIn", "Buttons/SettingsHoverOut");
+    }
+
+    private void handleClick(float x, float y, int skeletonIndex) {
+        if (isHoveringButton(x, y, Constants.MainMenuScreen.BUTTON_PLAY_NAME, skeletonIndex)) {
+            playButtonPressAnimation("Buttons/PlayPress", skeletonIndex);
+        } else if (isHoveringButton(x, y, Constants.MainMenuScreen.BUTTON_QUIT_NAME, skeletonIndex)) {
+            playButtonPressAnimation("Buttons/QuitPress", skeletonIndex);
+        } else if (isHoveringButton(x, y, Constants.MainMenuScreen.BUTTON_STGS_NAME, skeletonIndex)) {
+            playButtonPressAnimation("Buttons/SettingsPress", skeletonIndex);
+        }
+    }
+
+    private void initializeAnimations() {
+        initializeMenuSkeleton(AnimationType.MENU_1.ordinal());
+        initializeMenuSkeleton(AnimationType.MENU_2.ordinal());
+    }
+
+    private void initializeMenuSkeleton(int skeletonIndex) {
+
+        String atlasPath = Constants.MainMenuScreen.ATLAS;
+        String skeletonPath = Constants.MainMenuScreen.JSON;
+
+        skeletons.insert(skeletonIndex, game.getSpineAnimationHandler().createSkeleton(atlasPath, skeletonPath));
+        states.insert(skeletonIndex, game.getSpineAnimationHandler().createAnimationState(skeletons.get(skeletonIndex)));
+
+        states.get(skeletonIndex).setAnimation(0, "animation", false);
+
+        states.get(skeletonIndex).addListener(new AnimationState.AnimationStateListener() {
+            @Override
+            public void start(AnimationState.TrackEntry entry) {
+            }
+
+            @Override
+            public void interrupt(AnimationState.TrackEntry entry) {
+            }
+
+            @Override
+            public void end(AnimationState.TrackEntry entry) {
+            }
+
+            @Override
+            public void dispose(AnimationState.TrackEntry entry) {
+            }
+
+            @Override
+            public void complete(AnimationState.TrackEntry entry) {
+                if (entry.getAnimation().getName().equals("animation")) {
+                    isInitialAnimationFinished = true;
+                }
+            }
+
+            @Override
+            public void event(AnimationState.TrackEntry entry, Event event) {
+            }
+        });
+    }
+
+    private void renderBackground() {
+        backgroundStage.getViewport().apply();
+        game.getBatch().setProjectionMatrix(backgroundStage.getViewport().getCamera().combined);
+        game.getBatch().begin();
+        game.getBatch().draw(backgroundTexture, 0, 0, backgroundStage.getViewport().getWorldWidth(), backgroundStage.getViewport().getWorldHeight());
+        game.getBatch().end();
+    }
+
+    private void renderMainContent() {
+        renderMenu(game.getBatch(), stage.getViewport(), AnimationType.MENU_1.ordinal());
+        renderDebug(stage.getViewport(), Color.RED, AnimationType.MENU_1.ordinal());
+        stage.act(Gdx.graphics.getDeltaTime());
+        stage.draw();
+        TrailDot.renderTrail(game.getBatch(), stage.getViewport());
+    }
+
+    private void renderMinimap() {
+        if (!minimapIsOn)
+            return;
+        minimapStage.getViewport().apply();
+        game.getBatch().setProjectionMatrix(minimapStage.getViewport().getCamera().combined);
+        game.getBatch().begin();
+        game.getBatch().draw(minimapTexture, 0, 0, minimapStage.getViewport().getWorldWidth(), minimapStage.getViewport().getWorldHeight());
+        game.getBatch().end();
+
+        renderMenu(game.getBatch(), minimapStage.getViewport(), AnimationType.MENU_2.ordinal());
+        renderDebug(minimapStage.getViewport(), Color.GREEN, AnimationType.MENU_2.ordinal());
+        TrailDot.renderTrail(game.getBatch(), minimapStage.getViewport());
+    }
+
+    private void renderMenu(SpriteBatch batch, Viewport viewport, int skeletonIndex) {
+        Skeleton skeleton = skeletons.get(skeletonIndex);
+        AnimationState state = states.get(skeletonIndex);
+
+        viewport.apply();
+        batch.setProjectionMatrix(viewport.getCamera().combined);
+        batch.begin();
+
+        state.update(Gdx.graphics.getDeltaTime());
+        state.apply(skeleton);
+        skeleton.updateWorldTransform();
+        updateSkeletonScaleAndPosition(viewport, skeletonIndex);
+
+        skeletonRenderer.draw(batch, skeleton);
+
+        batch.end();
+    }
+
+    private void playButtonPressAnimation(final String animationName, int skeletonIndex) {
+        Gdx.app.log("MainMenuScreen", "Playing button press animation: " + animationName);
+        states.get(skeletonIndex).setAnimation(4, animationName, false).setListener(new AnimationState.AnimationStateListener() {
+            @Override
+            public void start(AnimationState.TrackEntry entry) {
+            }
+
+            @Override
+            public void interrupt(AnimationState.TrackEntry entry) {
+            }
+
+            @Override
+            public void end(AnimationState.TrackEntry entry) {
+            }
+
+            @Override
+            public void dispose(AnimationState.TrackEntry entry) {
+            }
+
+            @Override
+            public void complete(AnimationState.TrackEntry entry) {
+                Gdx.app.log("MainMenuScreen", "Animation complete: " + animationName);
+                if (animationName.equals("Buttons/PlayPress")) {
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            Gdx.app.log("MainMenuScreen", "Changing screen to: MainMenuScreen");
+                            // game.getScreenManager().pushScreen(new MainAnimationScreen(), new SlidingInTransition(game.getBatch(), SlidingDirection.DOWN, 1F));
+                            game.getScreenManager().pushScreen(new MainAnimationScreen(), createTransition());
+                        }
+                    });
+                } else if (animationName.equals("Buttons/SettingsPress")) {
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            Gdx.app.log("MainMenuScreen", "Changing screen to: ConfigScreen");
+                            game.getScreenManager().pushScreen(new ConfigurationScreen(), createTransition());
+                        }
+                    });
+                } else if (animationName.equals("Buttons/QuitPress")) {
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            Gdx.net.openURI("https://www.google.com");
+                        }
+                    });
+                }
+
+            }
+
+            @Override
+            public void event(AnimationState.TrackEntry entry, Event event) {
+            }
+        });
+    }
+
+    private void renderWithFBO() {
+        fbo.begin();
+
+        clearScreen();
+        renderBackground();
+        renderMainContent();
+
+        fbo.end();
+
+        fboMinimap.begin();
+
+        clearScreen();
+        renderMinimap();
+
+        fboMinimap.end();
+
+        stage.getViewport().apply();
+        game.getBatch().setProjectionMatrix(stage.getViewport().getCamera().combined);
+        game.getBatch().begin();
+        game.getBatch().draw(fboRegion, 0, 0, stage.getViewport().getWorldWidth(), stage.getViewport().getWorldHeight());
+        // maintain at stage viewport because the size is handled in renderMinimap()
+        game.getBatch().draw(fboRegionMinimap, 0, 0, stage.getViewport().getWorldWidth(), stage.getViewport().getWorldHeight());
+        game.getBatch().end();
+    }
+
+    @Override
+    public void render(float delta) {
+        clearScreen();
+        renderBackground();
+        renderMainContent();
+        renderMinimap();
+
+        // renderWithFBO();
+    }
+
+    private void renderDebug(Viewport viewport, Color color, int skeletonIndex) {
+        if (debugMode) {
+            shapeRenderer.setProjectionMatrix(viewport.getCamera().combined);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            shapeRenderer.setColor(color);
+            drawDebugBounds(Constants.MainMenuScreen.BUTTON_PLAY_NAME, skeletonIndex);
+            drawDebugBounds(Constants.MainMenuScreen.BUTTON_QUIT_NAME, skeletonIndex);
+            drawDebugBounds(Constants.MainMenuScreen.BUTTON_STGS_NAME, skeletonIndex);
+            shapeRenderer.end();
+        }
+    }
+
+    private void drawDebugBounds(String buttonName, int skeletonIndex) {
+        Rectangle bounds = getButtonBounds(buttonName, skeletonIndex);
+        shapeRenderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        createFBO(width, height);
+        createFBOMinimap(width, height);
+        stage.getViewport().update(width, height, true);
+        backgroundStage.getViewport().update(width, height, true);
+        updateMinimapViewport(width, height);
+    }
+
+    private void updateMinimapViewport(int width, int height) {
+        if (!minimapIsOn)
+            return;
+        minimapStage.getViewport().update(width, height, true);
+        minimapStage.getViewport().setScreenBounds(0, 0, 200, 200);
+    }
+
+    private void updateSkeletonScaleAndPosition(Viewport viewport, int skeletonIndex) {
+        setSkeletonScale(skeletons.get(skeletonIndex), Constants.MainMenuScreen.SKEL_WIDTH_PERCENTAGE, Constants.MainMenuScreen.SKEL_HEIGHT_PERCENTAGE, viewport);
+        setSkeletonPosition(skeletons.get(skeletonIndex), viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2);
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        if (stage != null)
+            stage.dispose();
+        if (minimapStage != null)
+            minimapStage.dispose();
+        if (backgroundStage != null)
+            backgroundStage.dispose();
+        if (game.getBatch() != null) {
+            game.getBatch().dispose();
+        }
+    }
+}

@@ -44,6 +44,11 @@ public class Constants {
         }
     }
 
+    public static class Zelda {
+        public static final String ATLAS = "spine/zelda.atlas";  // Adjust this path if necessary
+        public static final String JSON = "spine/zelda.json";  // Adjust this path if necessary
+    }
+
     public static class MainMenuScreen {
         public static final String ATLAS = "spine/menu.atlas";
         public static final String JSON = "spine/menu.json";

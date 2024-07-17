@@ -1,0 +1,132 @@
+
+zelda.png
+size: 1614,1557
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Capa 2
+  rotate: false
+  xy: 2, 629
+  size: 1237, 926
+  orig: 1239, 928
+  offset: 1, 1
+  index: -1
+boob-dcha
+  rotate: false
+  xy: 1345, 63
+  size: 167, 170
+  orig: 169, 172
+  offset: 1, 1
+  index: -1
+boob-izda
+  rotate: true
+  xy: 670, 3
+  size: 183, 180
+  orig: 185, 182
+  offset: 1, 1
+  index: -1
+brazo-dcha-1
+  rotate: false
+  xy: 852, 35
+  size: 169, 232
+  orig: 171, 234
+  offset: 1, 1
+  index: -1
+brazo-dcha-2
+  rotate: false
+  xy: 496, 2
+  size: 172, 184
+  orig: 174, 186
+  offset: 1, 1
+  index: -1
+brazo-dcha-3
+  rotate: false
+  xy: 1466, 328
+  size: 80, 103
+  orig: 82, 105
+  offset: 1, 1
+  index: -1
+brazo-izda-1
+  rotate: false
+  xy: 1023, 30
+  size: 153, 237
+  orig: 155, 239
+  offset: 1, 1
+  index: -1
+brazo-izda-2
+  rotate: true
+  xy: 594, 188
+  size: 79, 240
+  orig: 82, 242
+  offset: 2, 1
+  index: -1
+brazo-izda-3
+  rotate: false
+  xy: 1466, 242
+  size: 75, 84
+  orig: 77, 86
+  offset: 1, 1
+  index: -1
+crotch
+  rotate: false
+  xy: 1128, 270
+  size: 131, 158
+  orig: 133, 160
+  offset: 1, 1
+  index: -1
+head
+  rotate: true
+  xy: 1261, 235
+  size: 196, 203
+  orig: 198, 205
+  offset: 1, 1
+  index: -1
+pierna-dcha-1
+  rotate: true
+  xy: 1241, 884
+  size: 671, 338
+  orig: 673, 344
+  offset: 1, 1
+  index: -1
+pierna-dcha-2
+  rotate: false
+  xy: 1241, 433
+  size: 371, 449
+  orig: 374, 451
+  offset: 2, 1
+  index: -1
+pierna-dcha-3
+  rotate: false
+  xy: 1128, 430
+  size: 110, 197
+  orig: 112, 199
+  offset: 1, 1
+  index: -1
+pierna-izq-1
+  rotate: false
+  xy: 2, 188
+  size: 590, 439
+  orig: 592, 441
+  offset: 1, 1
+  index: -1
+pierna-izq-2
+  rotate: true
+  xy: 2, 33
+  size: 153, 492
+  orig: 155, 494
+  offset: 1, 1
+  index: -1
+pierna-izq-3
+  rotate: false
+  xy: 1178, 54
+  size: 165, 179
+  orig: 167, 181
+  offset: 1, 1
+  index: -1
+torso
+  rotate: true
+  xy: 594, 269
+  size: 358, 532
+  orig: 360, 534
+  offset: 1, 1
+  index: -1

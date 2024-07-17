@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kandclay.utils.Constants;
+import com.kandclay.utils.Shaders;
 import com.kandclay.utils.TrailDot;
 
 import static com.kandclay.utils.Shaders.createTransition;
@@ -19,7 +20,6 @@ import static com.kandclay.utils.Shaders.createTransition;
 public class ConfigurationScreen extends BaseScreen {
     private Slider volumeSlider;
     private TextButton backButton;
-    private TextButton hairColorButton;
     private TextButton coinColorButton;
     private boolean isYellowCoin;
     private Stage stage;
@@ -30,7 +30,6 @@ public class ConfigurationScreen extends BaseScreen {
 
     @Override
     public void show() {
-
         Camera camera = new OrthographicCamera();
         Viewport viewport = new ScreenViewport(camera);
         stage = new Stage(viewport);
@@ -38,7 +37,7 @@ public class ConfigurationScreen extends BaseScreen {
         Skin skin = game.getAssetManager().get(Constants.Skin.JSON, Skin.class);
         float savedVolume = game.getConfigManager().getPreference("volume", Constants.Audio.DEFAULT_VOLUME);
         isYellowCoin = game.getConfigManager().getPreference("coinColor", true);
-
+        final int[] currentInterpolation = {game.getConfigManager().getPreference("interpolation", 6)};
 
         volumeSlider = new Slider(0, 1, 0.01f, false, skin);
         volumeSlider.setValue(savedVolume);
@@ -75,7 +74,6 @@ public class ConfigurationScreen extends BaseScreen {
         table.add(new Label("Options", skin, Constants.Font.LABEL)).padBottom(Constants.UIButtons.PADDING).row();
         table.add(new Label("Volume", skin, Constants.Font.LABEL)).padBottom(Constants.UIButtons.PADDING).row();
         table.add(volumeSlider).width(Constants.UIButtons.SLIDER_WIDTH).padBottom(Constants.UIButtons.PADDING).row();
-        table.add(hairColorButton).width(Constants.UIButtons.CONTROL_BUTTON_WIDTH).height(Constants.UIButtons.CONTROL_BUTTON_HEIGHT).padBottom(Constants.UIButtons.PADDING).row();
         table.add(coinColorButton).width(Constants.UIButtons.CONTROL_BUTTON_WIDTH).height(Constants.UIButtons.CONTROL_BUTTON_HEIGHT).padBottom(Constants.UIButtons.PADDING).row();
         table.add(backButton).width(Constants.UIButtons.BACK_BUTTON_WIDTH).height(Constants.UIButtons.CONTROL_BUTTON_HEIGHT).padTop(Constants.UIButtons.PADDING);
 

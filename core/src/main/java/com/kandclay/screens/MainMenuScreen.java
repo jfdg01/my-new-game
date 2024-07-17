@@ -290,9 +290,8 @@ public class MainMenuScreen extends BaseScreen {
                     Gdx.app.postRunnable(new Runnable() {
                         @Override
                         public void run() {
-                            Gdx.app.log("MainMenuScreen", "Changing screen to: MainMenuScreen");
-                            // game.getScreenManager().pushScreen(new MainAnimationScreen(), new SlidingInTransition(game.getBatch(), SlidingDirection.DOWN, 1F));
-                            game.getScreenManager().pushScreen(new MainAnimationScreen(), createTransition());
+                            Gdx.app.log("MainMenuScreen", "Changing screen to: ZeldaScreen");
+                            game.getScreenManager().pushScreen(new ZeldaScreen(), createTransition());
                         }
                     });
                 } else if (animationName.equals("Buttons/SettingsPress")) {
