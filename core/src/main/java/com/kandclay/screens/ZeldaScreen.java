@@ -1,11 +1,17 @@
 package com.kandclay.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.esotericsoftware.spine.AnimationState;
+import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.SkeletonRenderer;
 import com.kandclay.utils.Constants;
@@ -16,6 +22,10 @@ public class ZeldaScreen extends BaseScreen {
     private AnimationState state;
     private SkeletonRenderer skeletonRenderer;
     private Viewport viewport;
+    private Bone targetBone;
+    private Vector2 lastMousePosition = new Vector2();
+    private boolean isDragging = false;
+    private ShapeRenderer shapeRenderer;
 
     public ZeldaScreen() {
         super();
@@ -23,31 +33,81 @@ public class ZeldaScreen extends BaseScreen {
 
     @Override
     public void show() {
-
-        viewport = new ExtendViewport(Constants.General.EMBED_WIDTH, Constants.General.EMBED_HEIGHT);
+        viewport = new FitViewport(800, 800);
         stage = new Stage(viewport);
 
         skeletonRenderer = new SkeletonRenderer();
         skeletonRenderer.setPremultipliedAlpha(true);
 
+        shapeRenderer = new ShapeRenderer();
+
         initializeZeldaSkeleton();
+
+        stage.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                Vector2 worldCoords = new Vector2(x, y);
+                if (isTouchingBone(worldCoords)) {
+                    isDragging = true;
+                    lastMousePosition.set(worldCoords);
+                }
+                return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                isDragging = false;
+            }
+
+            @Override
+            public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                if (isDragging) {
+                    Vector2 worldCoords = new Vector2(x, y);
+                    float deltaX = worldCoords.x - lastMousePosition.x;
+                    float deltaY = worldCoords.y - lastMousePosition.y;
+                    lastMousePosition.set(worldCoords);
+                    moveBone(deltaX, deltaY);
+                }
+            }
+        });
 
         Gdx.input.setInputProcessor(stage);
     }
 
-    private void initializeZeldaSkeleton() {
+    private boolean isTouchingBone(Vector2 touchPoint) {
+        if (targetBone != null) {
+            float boneX = targetBone.getWorldX();
+            float boneY = targetBone.getWorldY();
+            float distance = Vector2.dst(touchPoint.x, touchPoint.y, boneX, boneY);
+//            Gdx.app.log("", "\nBone (" + floor(boneX) + "," + floor(boneY) +
+//                ")\nTouchPoint (" + floor(touchPoint.x) + "," + floor(touchPoint.y) + ") \nDistance: " + floor(distance));
+            if (distance < 20) {
+                Gdx.app.log("ZeldaScreen", "Touching bone: " + targetBone.getData().getName());
+                return true; // Adjust this value to change the touch area size
+            }
+        }
+        return false;
+    }
 
+    private void initializeZeldaSkeleton() {
         String atlasPath = Constants.Zelda.ATLAS;
         String skeletonPath = Constants.Zelda.JSON;
 
         skeleton = game.getSpineAnimationHandler().createSkeleton(atlasPath, skeletonPath);
         state = game.getSpineAnimationHandler().createAnimationState(skeleton);
 
-        // Set initial animation - adjust "animation" to match your skeleton's animation name
-        state.setAnimation(0, "animation", true);
+        setSkeletonScale(skeleton, 0.8f, 0.8f, viewport);
 
-        setSkeletonScale(skeleton, 0.5f, 0.5f, viewport);  // Adjust scale as needed
-        setSkeletonPosition(skeleton, viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2);
+        // state.setAnimation(0, "animation", true);
+
+        targetBone = skeleton.findBone("target2");
+    }
+
+    private void moveBone(float deltaX, float deltaY) {
+        if (targetBone != null) {
+            targetBone.setX(targetBone.getX() + deltaX);
+            targetBone.setY(targetBone.getY() + deltaY);
+        }
     }
 
     @Override
@@ -64,6 +124,23 @@ public class ZeldaScreen extends BaseScreen {
         skeletonRenderer.draw(game.getBatch(), skeleton);
         game.getBatch().end();
 
+        // Draw debug circles
+        shapeRenderer.setProjectionMatrix(viewport.getCamera().combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+        // Draw red circle for mouse position
+        shapeRenderer.setColor(Color.CORAL);
+        Vector2 mouseWorldPos = viewport.unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+        shapeRenderer.circle(mouseWorldPos.x, mouseWorldPos.y, 10);
+
+        // Draw blue circle for target bone position
+        if (targetBone != null) {
+            shapeRenderer.setColor(Color.MAROON);
+            shapeRenderer.circle(targetBone.getWorldX(), targetBone.getWorldY(), 10);
+        }
+
+        shapeRenderer.end();
+
         stage.act(delta);
         stage.draw();
     }
@@ -71,7 +148,7 @@ public class ZeldaScreen extends BaseScreen {
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
-        setSkeletonScale(skeleton, 0.5f, 0.5f, viewport);  // Adjust scale as needed
+//        setSkeletonScale(skeleton, 0.8f, 0.8f, viewport);
         setSkeletonPosition(skeleton, viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2);
     }
 
@@ -80,6 +157,9 @@ public class ZeldaScreen extends BaseScreen {
         super.dispose();
         if (stage != null) {
             stage.dispose();
+        }
+        if (shapeRenderer != null) {
+            shapeRenderer.dispose();
         }
     }
 }

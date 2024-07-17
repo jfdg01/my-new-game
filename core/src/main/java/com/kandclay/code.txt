@@ -39,6 +39,11 @@ public abstract class BaseScreen extends ManagedScreen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     }
 
+    public void clearScreen(int red, int green, int blue, int alpha) {
+        Gdx.gl.glClearColor(red, green, blue, alpha);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+    }
+
     @Override
     public void render(float delta) {
         clearScreen();
@@ -863,9 +868,8 @@ public class MainMenuScreen extends BaseScreen {
                     Gdx.app.postRunnable(new Runnable() {
                         @Override
                         public void run() {
-                            Gdx.app.log("MainMenuScreen", "Changing screen to: MainMenuScreen");
-                            // game.getScreenManager().pushScreen(new MainAnimationScreen(), new SlidingInTransition(game.getBatch(), SlidingDirection.DOWN, 1F));
-                            game.getScreenManager().pushScreen(new MainAnimationScreen(), createTransition());
+                            Gdx.app.log("MainMenuScreen", "Changing screen to: ZeldaScreen");
+                            game.getScreenManager().pushScreen(new ZeldaScreen(), createTransition());
                         }
                     });
                 } else if (animationName.equals("Buttons/SettingsPress")) {
@@ -977,6 +981,81 @@ public class MainMenuScreen extends BaseScreen {
             backgroundStage.dispose();
         if (game.getBatch() != null) {
             game.getBatch().dispose();
+        }
+    }
+}
+
+
+public class ZeldaScreen extends BaseScreen {
+    private Stage stage;
+    private Skeleton skeleton;
+    private AnimationState state;
+    private SkeletonRenderer skeletonRenderer;
+    private Viewport viewport;
+
+    public ZeldaScreen() {
+        super();
+    }
+
+    @Override
+    public void show() {
+
+        viewport = new ExtendViewport(Constants.General.EMBED_WIDTH, Constants.General.EMBED_HEIGHT);
+        stage = new Stage(viewport);
+
+        skeletonRenderer = new SkeletonRenderer();
+        skeletonRenderer.setPremultipliedAlpha(true);
+
+        initializeZeldaSkeleton();
+
+        Gdx.input.setInputProcessor(stage);
+    }
+
+    private void initializeZeldaSkeleton() {
+
+        String atlasPath = Constants.Zelda.ATLAS;
+        String skeletonPath = Constants.Zelda.JSON;
+
+        skeleton = game.getSpineAnimationHandler().createSkeleton(atlasPath, skeletonPath);
+        state = game.getSpineAnimationHandler().createAnimationState(skeleton);
+
+        // Set initial animation - adjust "animation" to match your skeleton's animation name
+        state.setAnimation(0, "animation", true);
+
+        setSkeletonScale(skeleton, 0.5f, 0.5f, viewport);  // Adjust scale as needed
+        setSkeletonPosition(skeleton, viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2);
+    }
+
+    @Override
+    public void render(float delta) {
+        clearScreen(255, 255, 255, 0);
+
+        state.update(delta);
+        state.apply(skeleton);
+        skeleton.updateWorldTransform();
+
+        viewport.apply();
+        game.getBatch().setProjectionMatrix(viewport.getCamera().combined);
+        game.getBatch().begin();
+        skeletonRenderer.draw(game.getBatch(), skeleton);
+        game.getBatch().end();
+
+        stage.act(delta);
+        stage.draw();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        viewport.update(width, height, true);
+        setSkeletonScale(skeleton, 0.5f, 0.5f, viewport);  // Adjust scale as needed
+        setSkeletonPosition(skeleton, viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2);
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        if (stage != null) {
+            stage.dispose();
         }
     }
 }
