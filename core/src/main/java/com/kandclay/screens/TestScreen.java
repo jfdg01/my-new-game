@@ -7,12 +7,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.esotericsoftware.spine.AnimationState;
-import com.esotericsoftware.spine.Bone;
-import com.esotericsoftware.spine.Skeleton;
-import com.esotericsoftware.spine.SkeletonRenderer;
+import com.esotericsoftware.spine.*;
 import com.kandclay.utils.Constants;
 
 public class TestScreen extends BaseScreen {
@@ -25,6 +23,9 @@ public class TestScreen extends BaseScreen {
     private Vector2 lastMousePosition = new Vector2();
     private boolean isDragging = false;
     private ShapeRenderer shapeRenderer;
+
+    private static final boolean UP = true;
+    private static final boolean DOWN = false;
 
     public TestScreen() {
         super();
@@ -88,6 +89,14 @@ public class TestScreen extends BaseScreen {
         return false;
     }
 
+    private void showDrawOrder(Skeleton skeleton) {
+        for (int i = skeleton.getDrawOrder().size - 1; i >= 0; i--) {
+            Slot slot = skeleton.getDrawOrder().get(i);
+            Gdx.app.log("DrawOrder", slot.getData().getName());
+        }
+        Gdx.app.log("DrawOrder", "-----------------");
+    }
+
     private void initializeSkeleton() {
         String atlasPath = Constants.TestScreen.ATLAS;
         String skeletonPath = Constants.TestScreen.JSON;
@@ -95,11 +104,59 @@ public class TestScreen extends BaseScreen {
         skeleton = game.getSpineAnimationHandler().createSkeleton(atlasPath, skeletonPath);
         state = game.getSpineAnimationHandler().createAnimationState(skeleton);
 
-        setSkeletonScale(skeleton, 0.8f, 0.8f, viewport);
+        showDrawOrder(skeleton);
+
+        modifyDrawOrder(skeleton, "anl-clipping", DOWN);
+
+        showDrawOrder(skeleton);
+
+//        Gdx.app.log("DrawOrder", "-----------------");
 
         // state.setAnimation(0, "animation", true);
 
-        targetBone = skeleton.findBone("target2");
+        targetBone = skeleton.findBone("bone");
+    }
+
+    public void modifyDrawOrder(Skeleton skeleton, String slotName, boolean moveUp) {
+        modifyDrawOrder(skeleton, slotName, moveUp, 1);
+    }
+
+    public void modifyDrawOrder(Skeleton skeleton, String slotName, boolean moveUp, int times) {
+        Array<Slot> drawOrder = skeleton.getDrawOrder();
+        int currentIndex = -1;
+
+        // Find the index of the specified slot
+        for (int i = 0; i < drawOrder.size; i++) {
+            if (drawOrder.get(i).getData().getName().equals(slotName)) {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        // If the slot is found, modify its position in the draw order
+        if (currentIndex != -1) {
+            Slot slotToMove = drawOrder.get(currentIndex);
+            int newIndex;
+
+            if (moveUp) {
+                // Move up (towards the end of the array)
+                newIndex = Math.min(currentIndex + times, drawOrder.size - 1);
+            } else {
+                // Move down (towards the beginning of the array)
+                newIndex = Math.max(currentIndex - times, 0);
+            }
+
+            // Perform the move
+            if (newIndex != currentIndex) {
+                drawOrder.removeIndex(currentIndex);
+                drawOrder.insert(newIndex, slotToMove);
+
+                // Update the skeleton's draw order
+                skeleton.setDrawOrder(drawOrder);
+            }
+        } else {
+            System.out.println("Slot not found: " + slotName);
+        }
     }
 
     private void moveBone(float deltaX, float deltaY) {
@@ -111,7 +168,7 @@ public class TestScreen extends BaseScreen {
 
     @Override
     public void render(float delta) {
-        clearScreen(255, 255, 255, 0);
+        clearScreen(255, 100, 100, 0);
 
         state.update(delta);
         state.apply(skeleton);
@@ -147,8 +204,8 @@ public class TestScreen extends BaseScreen {
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
-//        setSkeletonScale(skeleton, 0.8f, 0.8f, viewport);
-        setSkeletonPosition(skeleton, 0,0);
+        setSkeletonScale(skeleton, 0.8f, 0.8f, viewport);
+        setSkeletonPosition(skeleton, 0,200);
     }
 
     @Override

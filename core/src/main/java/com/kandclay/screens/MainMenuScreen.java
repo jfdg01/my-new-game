@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -246,7 +246,7 @@ public class MainMenuScreen extends BaseScreen {
         TrailDot.renderTrail(game.getBatch(), minimapStage.getViewport());
     }
 
-    private void renderMenu(SpriteBatch batch, Viewport viewport, int skeletonIndex) {
+    private void renderMenu(Batch batch, Viewport viewport, int skeletonIndex) {
         Skeleton skeleton = skeletons.get(skeletonIndex);
         AnimationState state = states.get(skeletonIndex);
 

@@ -4,8 +4,7 @@ import com.badlogic.gdx.Gdx;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -29,14 +28,13 @@ public class Main extends ManagedGame<ManagedScreen, ScreenTransition> {
     private AudioManager audioManager;
     private ConfigurationManager configManager;
     private SpineAnimationHandler spineAnimationHandler;
-
-    private SpriteBatch batch;
+    private PolygonSpriteBatch batch;
 
     @Override
     public void create() {
         super.create();
 
-        batch = new SpriteBatch();
+        batch = new PolygonSpriteBatch();
         configManager = ConfigurationManager.getInstance();
         assetManager = MyAssetManager.getInstance();
         audioManager = AudioManager.getInstance();
@@ -116,7 +114,7 @@ public class Main extends ManagedGame<ManagedScreen, ScreenTransition> {
         }
     }
 
-    public SpriteBatch getBatch() {
+    public PolygonSpriteBatch getBatch() {
         return batch;
     }
 

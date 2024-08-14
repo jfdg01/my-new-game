@@ -2,7 +2,7 @@ package com.kandclay.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.SnapshotArray;
@@ -79,7 +79,7 @@ public class TrailDot {
         trailDotCount++;
     }
 
-    public static void renderTrail(SpriteBatch batch, Viewport viewport) {
+    public static void renderTrail(Batch batch, Viewport viewport) {
         viewport.apply();
         batch.setProjectionMatrix(viewport.getCamera().combined);
         batch.begin();

@@ -1,34 +1,34 @@
 
 double-movement-template.png
-size: 1439,917
+size: 1443,919
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 anus
   rotate: true
-  xy: 1287, 83
-  size: 179, 39
+  xy: 1289, 78
+  size: 181, 41
   orig: 181, 41
-  offset: 1, 1
+  offset: 0, 0
   index: -1
 back
   rotate: false
   xy: 2, 2
-  size: 1283, 913
+  size: 1285, 915
   orig: 1285, 915
-  offset: 1, 1
+  offset: 0, 0
   index: -1
 shaft
   rotate: false
-  xy: 1287, 521
-  size: 150, 394
+  xy: 1289, 520
+  size: 152, 397
   orig: 153, 398
-  offset: 1, 2
+  offset: 0, 0
   index: -1
 vag
   rotate: true
-  xy: 1287, 264
-  size: 255, 63
+  xy: 1289, 261
+  size: 257, 65
   orig: 257, 65
-  offset: 1, 1
+  offset: 0, 0
   index: -1
