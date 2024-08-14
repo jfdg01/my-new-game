@@ -7,7 +7,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.esotericsoftware.spine.AnimationState;
@@ -16,7 +15,7 @@ import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.SkeletonRenderer;
 import com.kandclay.utils.Constants;
 
-public class ZeldaScreen extends BaseScreen {
+public class TestScreen extends BaseScreen {
     private Stage stage;
     private Skeleton skeleton;
     private AnimationState state;
@@ -27,7 +26,7 @@ public class ZeldaScreen extends BaseScreen {
     private boolean isDragging = false;
     private ShapeRenderer shapeRenderer;
 
-    public ZeldaScreen() {
+    public TestScreen() {
         super();
     }
 
@@ -41,7 +40,7 @@ public class ZeldaScreen extends BaseScreen {
 
         shapeRenderer = new ShapeRenderer();
 
-        initializeZeldaSkeleton();
+        initializeSkeleton();
 
         stage.addListener(new InputListener() {
             @Override
@@ -89,9 +88,9 @@ public class ZeldaScreen extends BaseScreen {
         return false;
     }
 
-    private void initializeZeldaSkeleton() {
-        String atlasPath = Constants.Zelda.ATLAS;
-        String skeletonPath = Constants.Zelda.JSON;
+    private void initializeSkeleton() {
+        String atlasPath = Constants.TestScreen.ATLAS;
+        String skeletonPath = Constants.TestScreen.JSON;
 
         skeleton = game.getSpineAnimationHandler().createSkeleton(atlasPath, skeletonPath);
         state = game.getSpineAnimationHandler().createAnimationState(skeleton);
@@ -149,7 +148,7 @@ public class ZeldaScreen extends BaseScreen {
     public void resize(int width, int height) {
         viewport.update(width, height, true);
 //        setSkeletonScale(skeleton, 0.8f, 0.8f, viewport);
-        setSkeletonPosition(skeleton, viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2);
+        setSkeletonPosition(skeleton, 0,0);
     }
 
     @Override

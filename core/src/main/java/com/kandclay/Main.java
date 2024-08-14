@@ -15,6 +15,7 @@ import com.kandclay.managers.AudioManager;
 import com.kandclay.managers.ConfigurationManager;
 import com.kandclay.managers.MyAssetManager;
 import com.kandclay.screens.MainMenuScreen;
+import com.kandclay.screens.TestScreen;
 import com.kandclay.utils.Constants;
 import de.eskalon.commons.core.ManagedGame;
 import de.eskalon.commons.screen.ManagedScreen;
@@ -42,7 +43,8 @@ public class Main extends ManagedGame<ManagedScreen, ScreenTransition> {
         spineAnimationHandler = new SpineAnimationHandler();
 
         loadInitialAssets();
-        this.screenManager.pushScreen(new MainMenuScreen(), createTransition());
+        // this.screenManager.pushScreen(new MainMenuScreen(), createTransition());
+        this.screenManager.pushScreen(new TestScreen(), createTransition());
     }
 
     private void loadInitialAssets() {
@@ -54,7 +56,7 @@ public class Main extends ManagedGame<ManagedScreen, ScreenTransition> {
         assetManager.load(Constants.Background.PATH_1, Texture.class);
         assetManager.load(Constants.MainAnimationScreen.ATLAS, TextureAtlas.class);
         assetManager.load(Constants.Minimap.PATH, Texture.class);
-        assetManager.load(Constants.Zelda.ATLAS, TextureAtlas.class);
+        assetManager.load(Constants.TestScreen.ATLAS, TextureAtlas.class);
 
         // Load bitmap font
         assetManager.load(Constants.Font.FONT_FNT, BitmapFont.class);
