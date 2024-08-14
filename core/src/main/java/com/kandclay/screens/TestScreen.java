@@ -7,6 +7,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -27,8 +30,77 @@ public class TestScreen extends BaseScreen {
     private static final boolean UP = true;
     private static final boolean DOWN = false;
 
+    private TextField attachmentNameField;
+    private Button upButton;
+    private TextButton downButton;
+
+    private List<String> drawOrderList; // List to display the draw order
+    private ScrollPane scrollPane;
+
     public TestScreen() {
         super();
+    }
+
+    private void initializeUI() {
+        Skin skin = game.getAssetManager().get(Constants.Skin.JSON, Skin.class);
+
+        attachmentNameField = new TextField("", skin);
+        attachmentNameField.setPosition(10, 10);
+        attachmentNameField.setSize(200, 30);
+
+        upButton = new TextButton("Up", skin);
+        upButton.setPosition(220, 10);
+        upButton.setSize(80, 30);
+        upButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                modifyDrawOrder(skeleton, attachmentNameField.getText(), UP);
+                updateDrawOrderList();
+            }
+        });
+
+        downButton = new TextButton("Down", skin);
+        downButton.setPosition(310, 10);
+        downButton.setSize(80, 30);
+        downButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                modifyDrawOrder(skeleton, attachmentNameField.getText(), DOWN);
+                updateDrawOrderList();
+            }
+        });
+
+        TextButton swapButton = new TextButton("Swap", skin);
+        swapButton.setPosition(130, 10);
+        swapButton.setSize(80, 30);
+        swapButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                // Call the swap method for "anl-clipping" and "vgn-clipping"
+                swapSlotsInDrawOrder(skeleton, "anl-clipping", "vgn-clipping");
+                updateDrawOrderList();
+            }
+        });
+
+        // Initialize the list and scroll pane for draw order
+        drawOrderList = new List<String>(skin);
+        scrollPane = new ScrollPane(drawOrderList, skin);
+
+        // Adjust size and position for upper right corner
+        scrollPane.setSize(150, 200); // Smaller size
+        scrollPane.setPosition(640, 590); // Position in upper right corner
+
+        // Optionally, use a Table for better layout management
+        Table table = new Table();
+        table.setFillParent(true);
+        table.top().right(); // Align table to top-right
+        table.add(scrollPane).size(150, 200).padTop(10).padRight(10); // Set the size and padding
+
+        stage.addActor(table);
+        stage.addActor(attachmentNameField);
+        stage.addActor(upButton);
+        stage.addActor(downButton);
+        stage.addActor(swapButton);
     }
 
     @Override
@@ -41,7 +113,11 @@ public class TestScreen extends BaseScreen {
 
         shapeRenderer = new ShapeRenderer();
 
+        initializeUI();
+
         initializeSkeleton();
+
+        updateDrawOrderList();
 
         stage.addListener(new InputListener() {
             @Override
@@ -79,11 +155,9 @@ public class TestScreen extends BaseScreen {
             float boneX = targetBone.getWorldX();
             float boneY = targetBone.getWorldY();
             float distance = Vector2.dst(touchPoint.x, touchPoint.y, boneX, boneY);
-//            Gdx.app.log("", "\nBone (" + floor(boneX) + "," + floor(boneY) +
-//                ")\nTouchPoint (" + floor(touchPoint.x) + "," + floor(touchPoint.y) + ") \nDistance: " + floor(distance));
-            if (distance < 20) {
-                Gdx.app.log("ZeldaScreen", "Touching bone: " + targetBone.getData().getName());
-                return true; // Adjust this value to change the touch area size
+            if (distance < 20) { // In pixels
+                Gdx.app.log("Testcreen", "Touching bone: " + targetBone.getData().getName());
+                return true;
             }
         }
         return false;
@@ -104,13 +178,7 @@ public class TestScreen extends BaseScreen {
         skeleton = game.getSpineAnimationHandler().createSkeleton(atlasPath, skeletonPath);
         state = game.getSpineAnimationHandler().createAnimationState(skeleton);
 
-        showDrawOrder(skeleton);
-
-        modifyDrawOrder(skeleton, "anl-clipping", DOWN);
-
-        showDrawOrder(skeleton);
-
-//        Gdx.app.log("DrawOrder", "-----------------");
+        updateDrawOrderList();
 
         // state.setAnimation(0, "animation", true);
 
@@ -165,6 +233,58 @@ public class TestScreen extends BaseScreen {
             targetBone.setY(targetBone.getY() + deltaY);
         }
     }
+
+    private void updateDrawOrderList() {
+        Array<String> slotNames = new Array<String>();
+        Array<Slot> drawOrder = skeleton.getDrawOrder();
+        for (int i = drawOrder.size - 1; i >= 0; i--) {
+            slotNames.add(drawOrder.get(i).getData().getName());
+        }
+        drawOrderList.setItems(slotNames);
+    }
+
+    public void swapSlotsInDrawOrder(Skeleton skeleton, String slotName1, String slotName2) {
+        Array<Slot> drawOrder = skeleton.getDrawOrder();
+        int index1 = -1;
+        int index2 = -1;
+
+        // Find the indices of the two slots
+        for (int i = 0; i < drawOrder.size; i++) {
+            String currentSlotName = drawOrder.get(i).getData().getName();
+            if (currentSlotName.equals(slotName1)) {
+                index1 = i;
+            } else if (currentSlotName.equals(slotName2)) {
+                index2 = i;
+            }
+
+            // If both slots are found, no need to continue the loop
+            if (index1 != -1 && index2 != -1) {
+                break;
+            }
+        }
+
+        // If both slots are found, swap them
+        if (index1 != -1 && index2 != -1) {
+            Slot tempSlot = drawOrder.get(index1);
+            drawOrder.set(index1, drawOrder.get(index2));
+            drawOrder.set(index2, tempSlot);
+
+            // Update the skeleton's draw order
+            skeleton.setDrawOrder(drawOrder);
+
+            // Update the UI list
+            updateDrawOrderList();
+        } else {
+            // Handle the case where one or both slots were not found
+            if (index1 == -1) {
+                Gdx.app.log("SwapSlots", "Slot not found: " + slotName1);
+            }
+            if (index2 == -1) {
+                Gdx.app.log("SwapSlots", "Slot not found: " + slotName2);
+            }
+        }
+    }
+
 
     @Override
     public void render(float delta) {

@@ -55,8 +55,6 @@ public class Main extends ManagedGame<ManagedScreen, ScreenTransition> {
         assetManager.load(Constants.MainAnimationScreen.ATLAS, TextureAtlas.class);
         assetManager.load(Constants.Minimap.PATH, Texture.class);
         assetManager.load(Constants.TestScreen.ATLAS, TextureAtlas.class);
-
-        // Load bitmap font
         assetManager.load(Constants.Font.FONT_FNT, BitmapFont.class);
 
         assetManager.finishLoading();

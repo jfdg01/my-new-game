@@ -43,7 +43,7 @@ public class Constants {
             public static final String JSON = "spine/coin-red.json";
         }
     }
-    
+
     public static class TestScreen {
         public static final String ATLAS = "spine/double-movement-template.atlas";
         public static final String JSON = "spine/double-movement-template.json";
