@@ -6,7 +6,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -17,6 +16,7 @@ import com.badlogic.gdx.utils.viewport.*;
 import com.esotericsoftware.spine.*;
 import com.kandclay.utils.Constants;
 import com.kandclay.utils.TrailDot;
+import de.damios.guacamole.gdx.graphics.NestableFrameBuffer;
 
 import java.util.HashMap;
 
@@ -32,10 +32,10 @@ public class MainMenuScreen extends BaseScreen {
     private Stage backgroundStage;
     private Stage minimapStage;
 
-    private FrameBuffer fbo;
+    private NestableFrameBuffer fbo;
     private TextureRegion fboRegion;
 
-    private FrameBuffer fboMinimap;
+    private NestableFrameBuffer fboMinimap;
     private TextureRegion fboRegionMinimap;
 
     private TextureRegion backgroundTexture;
@@ -62,7 +62,7 @@ public class MainMenuScreen extends BaseScreen {
         if (fbo != null) {
             fbo.dispose();
         }
-        fbo = new FrameBuffer(Pixmap.Format.RGBA8888, width, height, false);
+        fbo = new NestableFrameBuffer(Pixmap.Format.RGBA8888, width, height, false);
         fboRegion = new TextureRegion(fbo.getColorBufferTexture());
         fboRegion.flip(false, true);
     }
@@ -73,7 +73,7 @@ public class MainMenuScreen extends BaseScreen {
         if (fboMinimap != null) {
             fboMinimap.dispose();
         }
-        fboMinimap = new FrameBuffer(Pixmap.Format.RGBA8888, width, height, false);
+        fboMinimap = new NestableFrameBuffer(Pixmap.Format.RGBA8888, width, height, false);
         fboRegionMinimap = new TextureRegion(fboMinimap.getColorBufferTexture());
         fboRegionMinimap.flip(false, true);
     }
@@ -286,29 +286,34 @@ public class MainMenuScreen extends BaseScreen {
             @Override
             public void complete(AnimationState.TrackEntry entry) {
                 Gdx.app.log("MainMenuScreen", "Animation complete: " + animationName);
-                if (animationName.equals("Buttons/PlayPress")) {
-                    Gdx.app.postRunnable(new Runnable() {
-                        @Override
-                        public void run() {
-                            Gdx.app.log("MainMenuScreen", "Changing screen to: ZeldaScreen");
-                            game.getScreenManager().pushScreen(new TestScreen(), createTransition());
-                        }
-                    });
-                } else if (animationName.equals("Buttons/SettingsPress")) {
-                    Gdx.app.postRunnable(new Runnable() {
-                        @Override
-                        public void run() {
-                            Gdx.app.log("MainMenuScreen", "Changing screen to: ConfigScreen");
-                            game.getScreenManager().pushScreen(new ConfigurationScreen(), createTransition());
-                        }
-                    });
-                } else if (animationName.equals("Buttons/QuitPress")) {
-                    Gdx.app.postRunnable(new Runnable() {
-                        @Override
-                        public void run() {
-                            Gdx.net.openURI("https://www.google.com");
-                        }
-                    });
+                switch (animationName) {
+                    case "Buttons/PlayPress":
+                        Gdx.app.postRunnable(new Runnable() {
+                            @Override
+                            public void run() {
+                                Gdx.app.log("MainMenuScreen", "Changing screen to: MainAnimationScreen");
+                                // game.getScreenManager().pushScreen(new TestScreen(), createTransition());
+                                game.getScreenManager().pushScreen(new MainAnimationScreen(), createTransition());
+                            }
+                        });
+                        break;
+                    case "Buttons/SettingsPress":
+                        Gdx.app.postRunnable(new Runnable() {
+                            @Override
+                            public void run() {
+                                Gdx.app.log("MainMenuScreen", "Changing screen to: ConfigScreen");
+                                game.getScreenManager().pushScreen(new ConfigurationScreen(), createTransition());
+                            }
+                        });
+                        break;
+                    case "Buttons/QuitPress":
+                        Gdx.app.postRunnable(new Runnable() {
+                            @Override
+                            public void run() {
+                                Gdx.net.openURI("https://www.google.com");
+                            }
+                        });
+                        break;
                 }
 
             }

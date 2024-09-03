@@ -86,7 +86,8 @@ public class Main extends ManagedGame<ManagedScreen, ScreenTransition> {
 
     @Override
     public void resize(int width, int height) {
-        screenManager.resize(width, height);
+        if (width > 0 && height > 0)
+            screenManager.resize(width, height);
     }
 
     @Override
