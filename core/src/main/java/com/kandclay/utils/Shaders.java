@@ -313,16 +313,7 @@ public class Shaders {
 
     private static Interpolation getRandomInterpolation() {
         Interpolation[] interpolations = new Interpolation[] {
-            Interpolation.circle,
-            Interpolation.exp10,
-            Interpolation.exp5,
-            Interpolation.fade,
-            Interpolation.linear,
-            Interpolation.pow2,
-            Interpolation.pow3,
-            Interpolation.pow4,
-            Interpolation.pow5,
-            Interpolation.sine,
+            Interpolation.smoother
         };
         Interpolation interpolation = interpolations[(int) (Math.random() * interpolations.length)];
         Gdx.app.log("Shaders", "Using interpolation: " + interpolation.getClass());
