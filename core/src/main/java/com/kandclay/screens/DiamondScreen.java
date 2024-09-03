@@ -58,14 +58,11 @@ public class DiamondScreen extends BaseScreen {
         state = game.getSpineAnimationHandler().createAnimationState(skeleton);
 
         state.setAnimation(0, "rotating-animation", true);
-
-        changeAttachmentColor("top-face", new Color(163, 163, 163, 0.4f), skeleton);
-
     }
 
     @Override
     public void render(float delta) {
-        clearScreen(255, 255, 255, 1); // Clear screen with a white background
+        clearScreen(0.5f, 0.5f, 0.5f, 1);
 
         state.update(delta);
         state.apply(skeleton);

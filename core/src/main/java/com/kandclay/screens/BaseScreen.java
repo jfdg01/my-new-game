@@ -55,11 +55,10 @@ public abstract class BaseScreen extends ManagedScreen {
     }
 
     public void clearScreen() {
-        Gdx.gl.glClearColor(0, 0, 0, 0);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        clearScreen(0, 0, 0, 0);
     }
 
-    public void clearScreen(int red, int green, int blue, int alpha) {
+    public void clearScreen(float red, float green, float blue, float alpha) {
         Gdx.gl.glClearColor(red, green, blue, alpha);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     }
