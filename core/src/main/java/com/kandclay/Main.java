@@ -13,8 +13,8 @@ import com.kandclay.handlers.SpineAnimationHandler;
 import com.kandclay.managers.AudioManager;
 import com.kandclay.managers.ConfigurationManager;
 import com.kandclay.managers.MyAssetManager;
-import com.kandclay.screens.MainMenuScreen;
-import com.kandclay.screens.TestScreen;
+import com.kandclay.screens.DiamondScreen;
+import com.kandclay.screens.PenetrationTestScreen;
 import com.kandclay.utils.Constants;
 import de.eskalon.commons.core.ManagedGame;
 import de.eskalon.commons.screen.ManagedScreen;
@@ -42,7 +42,7 @@ public class Main extends ManagedGame<ManagedScreen, ScreenTransition> {
 
         loadInitialAssets();
         // this.screenManager.pushScreen(new MainMenuScreen(), createTransition());
-        this.screenManager.pushScreen(new TestScreen(), createTransition());
+        this.screenManager.pushScreen(new DiamondScreen(), createTransition());
     }
 
     private void loadInitialAssets() {
@@ -56,6 +56,7 @@ public class Main extends ManagedGame<ManagedScreen, ScreenTransition> {
         assetManager.load(Constants.Minimap.PATH, Texture.class);
         assetManager.load(Constants.TestScreen.ATLAS, TextureAtlas.class);
         assetManager.load(Constants.Font.FONT_FNT, BitmapFont.class);
+        assetManager.load(Constants.DiamondScreen.ATLAS, TextureAtlas.class);
 
         assetManager.finishLoading();
         addFontsToSkin();

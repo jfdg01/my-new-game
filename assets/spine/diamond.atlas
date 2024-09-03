@@ -1,0 +1,27 @@
+
+diamond.png
+size: 465,271
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+lower-side
+  rotate: false
+  xy: 312, 117
+  size: 151, 152
+  orig: 155, 157
+  offset: 2, 4
+  index: -1
+top
+  rotate: false
+  xy: 2, 2
+  size: 308, 267
+  orig: 308, 267
+  offset: 0, 0
+  index: -1
+upper-side
+  rotate: false
+  xy: 312, 19
+  size: 130, 96
+  orig: 155, 110
+  offset: 12, 8
+  index: -1

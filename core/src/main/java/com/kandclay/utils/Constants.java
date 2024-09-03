@@ -8,6 +8,11 @@ public class Constants {
         public static final String TITLE = "K and Clay";
     }
 
+    public static class DiamondScreen {
+        public static final String ATLAS = "spine/diamond.atlas";
+        public static final String JSON = "spine/diamond.json";
+    }
+
     public static class SpriteAnimationSettings {
         public static final int NUM_COLS = 28; // Number of columns in the sprite sheet
         public static final int NUM_ROWS = 28; // Number of rows in the sprite sheet

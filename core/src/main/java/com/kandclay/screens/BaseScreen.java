@@ -1,6 +1,7 @@
 package com.kandclay.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -16,6 +17,7 @@ import com.kandclay.managers.MyAssetManager;
 import com.kandclay.utils.TrailDot;
 import de.eskalon.commons.screen.ManagedScreen;
 
+import java.security.interfaces.RSAKey;
 import java.util.HashMap;
 
 public abstract class BaseScreen extends ManagedScreen {
@@ -118,6 +120,15 @@ public abstract class BaseScreen extends ManagedScreen {
 
     protected Rectangle getButtonBounds(String buttonName, int pos) {
         return getRectangle(buttonName, buttonName, skeletons.get(pos));
+    }
+
+    protected void changeAttachmentColor(String slotName, Color color, Skeleton skeleton) {
+        Slot slot = skeleton.findSlot(slotName);
+        if (slot != null) {
+            slot.getColor().set(color);
+        } else {
+            Gdx.app.log("DiamondScreen", "Slot not found: " + slotName);
+        }
     }
 
     protected void updateHoverState(float x, float y, String buttonName, int pos, int trackIndex, String hoverInAnim, String hoverOutAnim) {

@@ -16,7 +16,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.esotericsoftware.spine.*;
 import com.kandclay.utils.Constants;
 
-public class TestScreen extends BaseScreen {
+public class PenetrationTestScreen extends BaseScreen {
     private Stage stage;
     private Skeleton skeleton;
     private AnimationState state;
@@ -37,7 +37,7 @@ public class TestScreen extends BaseScreen {
     private List<String> drawOrderList; // List to display the draw order
     private ScrollPane scrollPane;
 
-    public TestScreen() {
+    public PenetrationTestScreen() {
         super();
     }
 
