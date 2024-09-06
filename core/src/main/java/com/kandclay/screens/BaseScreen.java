@@ -5,12 +5,16 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.esotericsoftware.spine.*;
+import com.esotericsoftware.spine.attachments.Attachment;
+import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.kandclay.Main;
 import com.kandclay.managers.MyAssetManager;
@@ -31,12 +35,107 @@ public abstract class BaseScreen extends ManagedScreen {
     protected Array<Skeleton> skeletons;
     protected HashMap<String, Boolean> hoverStates;
 
+    protected Vector2 lastTouchPosition;
+    protected boolean isDragging;
+
+    protected Rectangle skeletonBounds;
+    protected Vector2 tempPosition;
+    protected Vector2 tempSize;
+    protected FloatArray tempVertices;
+
     public BaseScreen() {
         game = (Main) Gdx.app.getApplicationListener();
         this.skeletons = new Array<Skeleton>();
         this.states = new Array<AnimationState>();
 
         TrailDot.setSpineAnimationHandler(game.getSpineAnimationHandler());
+
+        lastTouchPosition = new Vector2();
+        skeletonBounds = new Rectangle();
+        tempPosition = new Vector2();
+        tempSize = new Vector2();
+        tempVertices = new FloatArray();
+    }
+
+    public void setupSkeletonDragging(Stage stage) {
+        stage.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if (isOverSkeleton(x, y)) {
+                    isDragging = true;
+                    lastTouchPosition.set(x, y);
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                if (isDragging) {
+                    float deltaX = x - lastTouchPosition.x;
+                    float deltaY = y - lastTouchPosition.y;
+                    if (!skeletons.isEmpty()) {
+                        Skeleton skeleton = skeletons.get(0);  // Assuming you want to drag the first skeleton
+                        skeleton.setPosition(skeleton.getX() + deltaX, skeleton.getY() + deltaY);
+                        lastTouchPosition.set(x, y);
+                    }
+                }
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                isDragging = false;
+            }
+        });
+    }
+
+    protected void updateSkeletonBounds() {
+        if (!skeletons.isEmpty()) {
+            Skeleton skeleton = skeletons.get(0);  // Assuming the first skeleton is the one being interacted with
+            skeleton.getBounds(tempPosition, tempSize, tempVertices);
+            skeletonBounds.set(tempPosition.x, tempPosition.y, tempSize.x, tempSize.y);
+        }
+    }
+
+    protected boolean isOverSkeleton(float x, float y) {
+        if (skeletonBounds.contains(x, y) && !skeletons.isEmpty()) {
+            Skeleton skeleton = skeletons.get(0);
+            Array<Slot> slots = skeleton.getSlots();
+
+            for (int i = 0; i < slots.size; i++) {
+                Slot slot = slots.get(i);
+                Attachment attachment = slot.getAttachment();
+                if (attachment instanceof RegionAttachment) {
+                    RegionAttachment region = (RegionAttachment) attachment;
+                    float[] vertices = tempVertices.setSize(8);
+                    region.computeWorldVertices(slot.getBone(), vertices, 0, 2);
+                    if (isPointInPolygon(x, y, vertices, 8)) {
+                        return true;
+                    }
+                } else if (attachment instanceof MeshAttachment) {
+                    MeshAttachment mesh = (MeshAttachment) attachment;
+                    int vertexCount = mesh.getWorldVerticesLength();
+                    float[] vertices = tempVertices.setSize(vertexCount);
+                    mesh.computeWorldVertices(slot, 0, vertexCount, vertices, 0, 2);
+                    if (isPointInPolygon(x, y, vertices, vertexCount)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean isPointInPolygon(float x, float y, float[] vertices, int vertexCount) {
+        boolean inside = false;
+        for (int i = 0, j = vertexCount - 2; i < vertexCount; j = i, i += 2) {
+            float xi = vertices[i], yi = vertices[i + 1];
+            float xj = vertices[j], yj = vertices[j + 1];
+            if (((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
+                inside = !inside;
+            }
+        }
+        return inside;
     }
 
     public void addTrailToStage(final Stage stage, final Viewport viewport) {
@@ -47,11 +146,6 @@ public abstract class BaseScreen extends ManagedScreen {
                 return false;
             }
         });
-    }
-
-    @Override
-    public void show() {
-
     }
 
     public void clearScreen() {
@@ -121,18 +215,9 @@ public abstract class BaseScreen extends ManagedScreen {
         return getRectangle(buttonName, buttonName, skeletons.get(pos));
     }
 
-    protected void changeAttachmentColor(String slotName, Color color, Skeleton skeleton) {
-        Slot slot = skeleton.findSlot(slotName);
-        if (slot != null) {
-            slot.getColor().set(color);
-        } else {
-            Gdx.app.log("DiamondScreen", "Slot not found: " + slotName);
-        }
-    }
-
     protected void updateHoverState(float x, float y, String buttonName, int pos, int trackIndex, String hoverInAnim, String hoverOutAnim) {
         boolean isHovered = isHoveringButton(x, y, buttonName, pos);
-        boolean wasHovered = hoverStates.get(buttonName);
+        boolean wasHovered = Boolean.TRUE.equals(hoverStates.get(buttonName));
 
         if (isHovered && !wasHovered) {
             states.get(pos).setAnimation(trackIndex, hoverInAnim, false);
