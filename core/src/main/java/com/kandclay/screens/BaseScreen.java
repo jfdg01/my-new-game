@@ -43,6 +43,9 @@ public abstract class BaseScreen extends ManagedScreen {
 
     public BaseScreen() {
         game = (Main) Gdx.app.getApplicationListener();
+
+        assetManager = game.getAssetManager();
+
         this.skeletons = new Array<Skeleton>();
         this.states = new Array<AnimationState>();
 
