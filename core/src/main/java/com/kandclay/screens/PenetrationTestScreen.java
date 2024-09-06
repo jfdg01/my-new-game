@@ -147,7 +147,8 @@ public class PenetrationTestScreen extends BaseScreen {
             }
         });
 
-        Gdx.input.setInputProcessor(stage);
+        addInputProcessor(stage);
+//        Gdx.input.setInputProcessor(stage);
     }
 
     private boolean isTouchingBone(Vector2 touchPoint) {

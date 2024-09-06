@@ -43,6 +43,7 @@ public class Main extends ManagedGame<ManagedScreen, ScreenTransition> {
         loadInitialAssets();
         // this.screenManager.pushScreen(new MainMenuScreen(), createTransition());
         this.screenManager.pushScreen(new DiamondScreen(), createTransition());
+        // this.screenManager.pushScreen(new PenetrationTestScreen(), createTransition());
     }
 
     private void loadInitialAssets() {
