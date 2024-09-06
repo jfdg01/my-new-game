@@ -100,7 +100,10 @@ public abstract class BaseScreen extends ManagedScreen {
     protected boolean isOverSkeleton(float x, float y) {
         if (skeletonBounds.contains(x, y) && !skeletons.isEmpty()) {
             Skeleton skeleton = skeletons.get(0);
-            for (Slot slot : skeleton.getSlots()) {
+            Array<Slot> slots = skeleton.getSlots();
+
+            for (int i = 0; i < slots.size; i++) {
+                Slot slot = slots.get(i);
                 Attachment attachment = slot.getAttachment();
                 if (attachment instanceof RegionAttachment) {
                     RegionAttachment region = (RegionAttachment) attachment;
@@ -143,11 +146,6 @@ public abstract class BaseScreen extends ManagedScreen {
                 return false;
             }
         });
-    }
-
-    @Override
-    public void show() {
-
     }
 
     public void clearScreen() {
@@ -217,18 +215,9 @@ public abstract class BaseScreen extends ManagedScreen {
         return getRectangle(buttonName, buttonName, skeletons.get(pos));
     }
 
-    protected void changeAttachmentColor(String slotName, Color color, Skeleton skeleton) {
-        Slot slot = skeleton.findSlot(slotName);
-        if (slot != null) {
-            slot.getColor().set(color);
-        } else {
-            Gdx.app.log("DiamondScreen", "Slot not found: " + slotName);
-        }
-    }
-
     protected void updateHoverState(float x, float y, String buttonName, int pos, int trackIndex, String hoverInAnim, String hoverOutAnim) {
         boolean isHovered = isHoveringButton(x, y, buttonName, pos);
-        boolean wasHovered = hoverStates.get(buttonName);
+        boolean wasHovered = Boolean.TRUE.equals(hoverStates.get(buttonName));
 
         if (isHovered && !wasHovered) {
             states.get(pos).setAnimation(trackIndex, hoverInAnim, false);
