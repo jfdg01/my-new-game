@@ -35,7 +35,7 @@ public class DiamondScreen extends BaseScreen {
         setupSkeletonDragging(stage);
         addInputProcessor(stage);
 
-        setSkeletonScale(skeleton, 0.8f, 0.8f, viewport);
+        setSkeletonScale(skeleton, viewport);
         setSkeletonPosition(skeleton, viewport.getWorldWidth() / 2, 0);
     }
 

@@ -325,7 +325,7 @@ public class PenetrationTestScreen extends BaseScreen {
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
-        setSkeletonScale(skeleton, 0.8f, 0.8f, viewport);
+        setSkeletonScale(skeleton, viewport, 0.8f, 0.8f);
         setSkeletonPosition(skeleton, 0,200);
     }
 

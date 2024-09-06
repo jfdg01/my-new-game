@@ -204,7 +204,7 @@ public class MainAnimationScreen extends BaseScreen {
             states.set(AnimationType.COIN.ordinal(), game.getSpineAnimationHandler().createAnimationState(skeletons.get(AnimationType.COIN.ordinal())));
         }
 
-        setSkeletonScale(skeletons.get(AnimationType.COIN.ordinal()), Constants.MainAnimationScreen.COIN_WIDTH_PERCENTAGE, Constants.MainAnimationScreen.COIN_HEIGHT_PERCENTAGE, stage.getViewport());
+        setSkeletonScale(skeletons.get(AnimationType.COIN.ordinal()), stage.getViewport(), Constants.MainAnimationScreen.COIN_WIDTH_PERCENTAGE, Constants.MainAnimationScreen.COIN_HEIGHT_PERCENTAGE);
         setSkeletonPosition(skeletons.get(AnimationType.COIN.ordinal()), stage.getViewport().getWorldWidth() / 2, stage.getViewport().getWorldHeight() / 2);
         states.get(AnimationType.COIN.ordinal()).setAnimation(0, "animation", true);
         states.get(AnimationType.COIN.ordinal()).getCurrent(0).setTrackTime(stateTime);
@@ -231,7 +231,7 @@ public class MainAnimationScreen extends BaseScreen {
         skeletons.insert(AnimationType.BUTTON.ordinal(), game.getSpineAnimationHandler().createSkeleton(atlasPath, skeletonPath));
         states.insert(AnimationType.BUTTON.ordinal(), game.getSpineAnimationHandler().createAnimationState(skeletons.get(AnimationType.BUTTON.ordinal())));
 
-        setSkeletonScale(skeletons.get(AnimationType.BUTTON.ordinal()), Constants.MainAnimationScreen.BUTTONS_WIDTH_PERCENTAGE, Constants.MainAnimationScreen.BUTTONS_HEIGHT_PERCENTAGE, stage.getViewport());
+        setSkeletonScale(skeletons.get(AnimationType.BUTTON.ordinal()), stage.getViewport(), Constants.MainAnimationScreen.BUTTONS_WIDTH_PERCENTAGE, Constants.MainAnimationScreen.BUTTONS_HEIGHT_PERCENTAGE);
         setSkeletonPosition(skeletons.get(AnimationType.BUTTON.ordinal()), 0, stage.getViewport().getWorldHeight());
 
         playButtonPressAnimation("1x/pressed", 1f);
@@ -360,10 +360,10 @@ public class MainAnimationScreen extends BaseScreen {
         backgroundViewport.update(width, height, true);
         uiViewport.update(width, height, true);
 
-        setSkeletonScale(skeletons.get(AnimationType.COIN.ordinal()), Constants.MainAnimationScreen.COIN_WIDTH_PERCENTAGE, Constants.MainAnimationScreen.COIN_HEIGHT_PERCENTAGE, stage.getViewport());  // Adjust the percentages as needed
+        setSkeletonScale(skeletons.get(AnimationType.COIN.ordinal()), stage.getViewport(), Constants.MainAnimationScreen.COIN_WIDTH_PERCENTAGE, Constants.MainAnimationScreen.COIN_HEIGHT_PERCENTAGE);  // Adjust the percentages as needed
         setSkeletonPosition(skeletons.get(AnimationType.COIN.ordinal()), stage.getViewport().getWorldWidth() / 2, stage.getViewport().getWorldHeight() / 2);
 
-        setSkeletonScale(skeletons.get(AnimationType.BUTTON.ordinal()), Constants.MainAnimationScreen.BUTTONS_WIDTH_PERCENTAGE, Constants.MainAnimationScreen.BUTTONS_HEIGHT_PERCENTAGE, stage.getViewport());  // Adjust the percentages as needed
+        setSkeletonScale(skeletons.get(AnimationType.BUTTON.ordinal()), stage.getViewport(), Constants.MainAnimationScreen.BUTTONS_WIDTH_PERCENTAGE, Constants.MainAnimationScreen.BUTTONS_HEIGHT_PERCENTAGE);  // Adjust the percentages as needed
         setSkeletonPosition(skeletons.get(AnimationType.BUTTON.ordinal()), 0, stage.getViewport().getWorldHeight());
     }
 

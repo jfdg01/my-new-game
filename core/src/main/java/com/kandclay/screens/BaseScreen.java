@@ -1,7 +1,6 @@
 package com.kandclay.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -21,7 +20,6 @@ import com.kandclay.managers.MyAssetManager;
 import com.kandclay.utils.TrailDot;
 import de.eskalon.commons.screen.ManagedScreen;
 
-import java.security.interfaces.RSAKey;
 import java.util.HashMap;
 
 public abstract class BaseScreen extends ManagedScreen {
@@ -189,7 +187,11 @@ public abstract class BaseScreen extends ManagedScreen {
         }
     }
 
-    protected void setSkeletonScale(Skeleton skeleton, float widthPercentage, float heightPercentage, Viewport viewport) {
+    protected void setSkeletonScale(Skeleton skeleton, Viewport viewport) {
+        setSkeletonScale(skeleton, viewport, 1, 1);
+    }
+
+    protected void setSkeletonScale(Skeleton skeleton, Viewport viewport, float widthPercentage, float heightPercentage) {
         if (skeleton != null) {
             float screenWidth = viewport.getWorldWidth();
             float screenHeight = viewport.getWorldHeight();

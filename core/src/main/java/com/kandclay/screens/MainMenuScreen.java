@@ -393,7 +393,7 @@ public class MainMenuScreen extends BaseScreen {
     }
 
     private void updateSkeletonScaleAndPosition(Viewport viewport, int skeletonIndex) {
-        setSkeletonScale(skeletons.get(skeletonIndex), Constants.MainMenuScreen.SKEL_WIDTH_PERCENTAGE, Constants.MainMenuScreen.SKEL_HEIGHT_PERCENTAGE, viewport);
+        setSkeletonScale(skeletons.get(skeletonIndex), viewport, Constants.MainMenuScreen.SKEL_WIDTH_PERCENTAGE, Constants.MainMenuScreen.SKEL_HEIGHT_PERCENTAGE);
         setSkeletonPosition(skeletons.get(skeletonIndex), viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2);
     }
 
