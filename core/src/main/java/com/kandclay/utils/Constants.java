@@ -59,6 +59,11 @@ public class Constants {
         public static final String JSON = "spine/zelda.json";  // Adjust this path if necessary
     }
 
+    public static class Celesphonia {
+        public static final String ATLAS = "spine\\Celesphonia_CUTS.atlas";
+        public static final String JSON = "spine\\Celesphonia_CUTS.json";
+    }
+
     public static class MainMenuScreen {
         public static final String ATLAS = "spine/menu.atlas";
         public static final String JSON = "spine/menu.json";

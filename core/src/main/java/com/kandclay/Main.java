@@ -13,6 +13,7 @@ import com.kandclay.handlers.SpineAnimationHandler;
 import com.kandclay.managers.AudioManager;
 import com.kandclay.managers.ConfigurationManager;
 import com.kandclay.managers.MyAssetManager;
+import com.kandclay.screens.CelesphoniaScreen;
 import com.kandclay.screens.DiamondScreen;
 import com.kandclay.screens.MainMenuScreen;
 import com.kandclay.screens.PenetrationTestScreen;
@@ -42,7 +43,8 @@ public class Main extends ManagedGame<ManagedScreen, ScreenTransition> {
         spineAnimationHandler = new SpineAnimationHandler();
 
         loadInitialAssets();
-        this.screenManager.pushScreen(new MainMenuScreen(), createTransition());
+        this.screenManager.pushScreen(new CelesphoniaScreen(), createTransition());
+        // this.screenManager.pushScreen(new MainMenuScreen(), createTransition());
         // this.screenManager.pushScreen(new DiamondScreen(), createTransition());
         // this.screenManager.pushScreen(new PenetrationTestScreen(), createTransition());
     }
@@ -53,6 +55,8 @@ public class Main extends ManagedGame<ManagedScreen, ScreenTransition> {
         assetManager.load(Constants.TrailDot.ATLAS, TextureAtlas.class);
         assetManager.load(Constants.MainAnimationScreen.YellowCoin.ATLAS, TextureAtlas.class);
         assetManager.load(Constants.MainAnimationScreen.RedCoin.ATLAS, TextureAtlas.class);
+        assetManager.load(Constants.Celesphonia.ATLAS, TextureAtlas.class);
+        assetManager.load(Constants.Celesphonia.JSON, TextureAtlas.class);
         assetManager.load(Constants.Background.PATH_1, Texture.class);
         assetManager.load(Constants.MainAnimationScreen.ATLAS, TextureAtlas.class);
         assetManager.load(Constants.Minimap.PATH, Texture.class);
@@ -61,7 +65,7 @@ public class Main extends ManagedGame<ManagedScreen, ScreenTransition> {
         assetManager.load(Constants.DiamondScreen.ATLAS, TextureAtlas.class);
 
         assetManager.finishLoading();
-        addFontsToSkin();
+        //addFontsToSkin();
     }
 
     private void addFontsToSkin() {
