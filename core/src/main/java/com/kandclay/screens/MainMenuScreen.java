@@ -256,7 +256,7 @@ public class MainMenuScreen extends BaseScreen {
 
         state.update(Gdx.graphics.getDeltaTime());
         state.apply(skeleton);
-        skeleton.updateWorldTransform();
+        //skeleton.updateWorldTransform(Skeleton.Physics.update);
         updateSkeletonScaleAndPosition(viewport, skeletonIndex);
 
         skeletonRenderer.draw(batch, skeleton);

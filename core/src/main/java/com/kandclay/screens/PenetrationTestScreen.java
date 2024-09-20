@@ -293,7 +293,7 @@ public class PenetrationTestScreen extends BaseScreen {
 
         state.update(delta);
         state.apply(skeleton);
-        skeleton.updateWorldTransform();
+        skeleton.updateWorldTransform(Skeleton.Physics.update);
 
         viewport.apply();
         game.getBatch().setProjectionMatrix(viewport.getCamera().combined);

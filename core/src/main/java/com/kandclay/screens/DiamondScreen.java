@@ -161,7 +161,7 @@ public class DiamondScreen extends BaseScreen {
 
         // Apply the animation state
         state.apply(skeleton);
-        skeleton.updateWorldTransform();
+        skeleton.updateWorldTransform(Skeleton.Physics.update);
         updateSkeletonBounds();
 
         // Update the stage (for UI interactions)

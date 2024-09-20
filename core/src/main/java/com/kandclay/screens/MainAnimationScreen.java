@@ -305,11 +305,11 @@ public class MainAnimationScreen extends BaseScreen {
         }
 
         states.get(AnimationType.COIN.ordinal()).apply(skeletons.get(AnimationType.COIN.ordinal()));
-        skeletons.get(AnimationType.COIN.ordinal()).updateWorldTransform();
+        skeletons.get(AnimationType.COIN.ordinal()).updateWorldTransform(Skeleton.Physics.update);
 
         states.get(AnimationType.BUTTON.ordinal()).update(delta);
         states.get(AnimationType.BUTTON.ordinal()).apply(skeletons.get(AnimationType.BUTTON.ordinal()));
-        skeletons.get(AnimationType.BUTTON.ordinal()).updateWorldTransform();
+        skeletons.get(AnimationType.BUTTON.ordinal()).updateWorldTransform(Skeleton.Physics.update);
 
         // Render background
         backgroundViewport.apply();

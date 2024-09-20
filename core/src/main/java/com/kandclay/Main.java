@@ -14,6 +14,7 @@ import com.kandclay.managers.AudioManager;
 import com.kandclay.managers.ConfigurationManager;
 import com.kandclay.managers.MyAssetManager;
 import com.kandclay.screens.DiamondScreen;
+import com.kandclay.screens.MainMenuScreen;
 import com.kandclay.screens.PenetrationTestScreen;
 import com.kandclay.utils.Constants;
 import de.eskalon.commons.core.ManagedGame;
@@ -41,8 +42,8 @@ public class Main extends ManagedGame<ManagedScreen, ScreenTransition> {
         spineAnimationHandler = new SpineAnimationHandler();
 
         loadInitialAssets();
-        // this.screenManager.pushScreen(new MainMenuScreen(), createTransition());
-        this.screenManager.pushScreen(new DiamondScreen(), createTransition());
+        this.screenManager.pushScreen(new MainMenuScreen(), createTransition());
+        // this.screenManager.pushScreen(new DiamondScreen(), createTransition());
         // this.screenManager.pushScreen(new PenetrationTestScreen(), createTransition());
     }
 

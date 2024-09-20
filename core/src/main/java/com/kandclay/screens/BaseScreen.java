@@ -109,7 +109,7 @@ public abstract class BaseScreen extends ManagedScreen {
                 if (attachment instanceof RegionAttachment) {
                     RegionAttachment region = (RegionAttachment) attachment;
                     float[] vertices = tempVertices.setSize(8);
-                    region.computeWorldVertices(slot.getBone(), vertices, 0, 2);
+                    region.computeWorldVertices(slot, vertices, 0, 2);
                     if (isPointInPolygon(x, y, vertices, 8)) {
                         return true;
                     }
@@ -244,7 +244,7 @@ public abstract class BaseScreen extends ManagedScreen {
         if (attachment == null) return new Rectangle();
 
         float[] vertices = new float[8];
-        attachment.computeWorldVertices(slot.getBone(), vertices, 0, 2);
+        attachment.computeWorldVertices(slot, vertices, 0, 2);
 
         float minX = vertices[0];
         float minY = vertices[1];

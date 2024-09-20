@@ -90,7 +90,7 @@ public class TrailDot {
             if (trailDot.viewport == viewport) {
                 trailDot.state.update(Gdx.graphics.getDeltaTime());
                 trailDot.state.apply(trailDot.skeleton);
-                trailDot.skeleton.updateWorldTransform();
+                trailDot.skeleton.updateWorldTransform(Skeleton.Physics.update);
                 trailDot.skeleton.setPosition(trailDot.x, trailDot.y);
 
                 trailDot.renderer.draw(batch, trailDot.skeleton);
